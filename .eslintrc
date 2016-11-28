@@ -1,0 +1,46 @@
+{
+  "parser": "babel-eslint",
+  "rules": {
+    "indent": [2, 2, {"SwitchCase": 1}],
+    "comma-dangle": 0,
+    "linebreak-style": [2, "unix"],
+    "semi": [2, "always"],
+    "no-console": 0,
+    "curly": [2, "all"],
+    "brace-style": [2, "1tbs"],
+    "new-parens": 2,
+    "space-infix-ops": 2,
+    "no-trailing-spaces": 2,
+    "max-len": ["error", {"ignoreUrls": true, "code": 90}],
+    "no-template-curly-in-string": "off",
+    "react/prefer-stateless-function": "off",
+    "react/jsx-filename-extension": "off",
+    "react/forbid-prop-types": "off",
+    "react/no-multi-comp": "off",
+    "react/no-unused-prop-types": ["error", {"skipShapeProps": true}],
+    "react/jsx-indent-props": "off",
+    "import/no-named-as-default": "off",
+    "import/no-extraneous-dependencies": "off",
+  },
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true,
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "airbnb",
+  ],
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "ecmaFeatures": {
+      "jsx": true,
+    },
+  },
+  "plugins": [
+    "react",
+    "jsx-a11y",
+    "import"
+  ],
+}
