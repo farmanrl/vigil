@@ -22,16 +22,16 @@ const Header = ({ authenticated, signOut }) => {
         <div
           style={{
             display: 'flex',
-            width: 150,
+            width: 170,
             alignItems: 'center',
             justifyContent: 'space-around'
           }}
         >
           <img
-            src="https://upload.wikimedia.org/wikipedia/commons/7/71/V_logo_noir.png"
+            src={require("./vigil.png")}
             className="App-logo"
             alt="logo"
-            style={{ filter: 'invert(100%)', height: 65 }}
+            style={{ height: 60 }}
           />
           <h2>VIGIL</h2>
         </div>

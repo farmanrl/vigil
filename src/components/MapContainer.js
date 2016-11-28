@@ -19,24 +19,25 @@ class MapContainer extends Component {
       nodes: null,
       filter: 'all',
       start: 0,
-      showModal: false
+      showModal: false,
+      key: null
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.getNodes();
   }
 
   getNodes = () => {
     firebase.database().ref('nodes/')
-            .on('value', (snapshot) => {
+            .once('value', (snapshot) => {
               const nodes = [];
               snapshot.forEach((data) => {
                 if (data.val().timestamp > this.state.start) {
                   nodes.push(data.val());
                 }
               });
-              this.setState({ nodes });
+              this.setState({ nodes, key: Date.now() });
             });
   }
 
@@ -49,7 +50,8 @@ class MapContainer extends Component {
       const node = { lat, lng, timestamp };
       const updates = {};
       updates[`/nodes/${id}`] = node;
-      firebase.database().ref().update(updates);
+      firebase.database().ref().update(updates)
+              .then(() => this.getNodes());
     });
     this.close();
   }
@@ -63,38 +65,39 @@ class MapContainer extends Component {
   }
 
   handleSelect = (key) => {
+    console.log('unblessed', key);
     const time = Date.now();
     switch (key) {
       case 'day': {
         const day = 86400000;
-        this.setState({ filter: key, start: time - day }, this.getNodes);
+        this.setState({ filter: key, start: time - day }, this.getNodes());
         break;
       }
       case 'week': {
         const week = 604800000;
-        this.setState({ filter: key, start: time - week }, this.getNodes);
+        this.setState({ filter: key, start: time - week }, this.getNodes());
         break;
       }
       case 'month': {
         const month = 2629746000;
-        this.setState({ filter: key, start: time - month }, this.getNodes);
+        this.setState({ filter: key, start: time - month }, this.getNodes());
         break;
       }
       case 'year': {
         const year = 31536000000;
-        this.setState({ filter: key, start: time - year }, this.getNodes);
+        this.setState({ filter: key, start: time - year }, this.getNodes());
         break;
       }
       case 'all':
-        this.setState({ filter: key, start: 0 }, this.getNodes);
+        this.setState({ filter: key, start: 0 }, this.getNodes());
         break;
       default:
-        this.setState({ filter: null, start: 0 }, this.getNodes);
+        this.setState({ filter: null, start: 0 }, this.getNodes());
     }
   }
 
   render() {
-    console.log(!this.props.auth.isAnon);
+    console.log('nodestate',this.state.nodes);
     const addNodeDisabledTip = (
       <Tooltip id="tooltip">You must login to report location</Tooltip>
     );
@@ -164,7 +167,7 @@ class MapContainer extends Component {
         </OverlayTrigger>
         }
         <Map
-            key={this.state.start}
+            key={this.state.key}
             location={this.state.location}
             center={this.state.center}
             nodes={this.state.nodes}
