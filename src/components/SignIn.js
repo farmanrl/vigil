@@ -5,23 +5,29 @@ import { authActions } from '../redux/auth';
 
 export function SignIn({ signInWithGoogle, signInAnon }) {
   return (
-    <div>
+    <div style={{ height: 'auto', minHeight: '100%', backgroundColor: '#333', color: 'white'}}>
       <img
           src={require("./vigil.png")}
           className="App-logo"
           alt="logo"
-          style={{ height: 250, paddingTop: 25 }}
+          style={{ height: 200, paddingTop: 12 }}
       />
-      <h1>Sign in with your account</h1>
+      <h1>VIGIL</h1>
+      <br />
       <Button bsSize="lg" onClick={signInWithGoogle}>
         Sign In
       </Button>
       <h4>Signing in will allow you to report your location,</h4>
-      <h4>and allow us to provide further resources for your safety.</h4>
-      <h1>Or continue without authorization</h1>
+      <h4>resources provided based on domain.</h4>
+      <h4>All user data is anonymous.</h4>
+      <br />
       <Button bsSize="lg" onClick={signInAnon}>
         Continue
       </Button>
+      <h4>You will not be able to report your location,</h4>
+      <h4>or access additional resources for domains.</h4>
+      <br />
+      <h5>Add page to home screen to use as an app!</h5>
     </div>
   );
 }

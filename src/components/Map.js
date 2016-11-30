@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react';
 import GoogleMap from 'google-map-react';
-
+import { Glyphicon } from 'react-bootstrap';
 const styles = [
   {
     elementType: 'geometry',
@@ -181,33 +181,16 @@ const styles = [
 ];
 
 class Map extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { center: null, location: null, zoom: 16, };
-  }
-
-
-  componentWillMount = () => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const coords = { lat: position.coords.latitude, lng: position.coords.longitude };
-      this.setState({ center: coords, location: coords });
-    });
-  }
-
-  onChange = ({ center, zoom }) => {
-    this.setState({ center, zoom });
-  }
   createMapOptions = maps => { return { styles }; };
 
   render() {
-    console.log(this.state.center, this.state.location);
     return (
       <div style={{ position: 'absolute', top: 120, bottom: 0, width: '100%' }}>
         {this.props.nodes &&
         <GoogleMap
             options={this.createMapOptions}
-            center={this.state.center}
-            defaultZoom={this.state.zoom}
+            center={this.props.location}
+            zoom={16}
             onChange={this.onChange}
             yesIWantToUseGoogleMapApiInternals
             onGoogleApiLoaded={({ map, maps }) => {
@@ -222,21 +205,22 @@ class Map extends Component {
               }
             }}
         >
-          {this.state.location &&
-          <img
-              src="https://www.materialui.co/materialIcons/action/room_black_144x144.png"
-              lat={this.state.location.lat}
-              lng={this.state.location.lng}
-              style={{
-                height: 30,
-                width: 30,
-                position: 'relative',
-                bottom: 30,
-                right: 15,
-                filter: 'invert(100%)'
-              }}
-               role="presentation"
-          />
+          {this.props.location &&
+           <div
+             style={{
+                 fontSize: 30,
+                 position: 'relative',
+                 bottom: 30,
+                 right: 15,
+                 filter: 'invert(100%)'
+               }}
+               lat={this.props.location.lat}
+               lng={this.props.location.lng}
+           >
+             <Glyphicon
+                 glyph="glyphicon glyphicon-map-marker"
+             />
+           </div>
           }
         </GoogleMap>
         }
@@ -246,10 +230,8 @@ class Map extends Component {
 }
 
 Map.propTypes = {
-  center: PropTypes.object,
   location: PropTypes.object,
   nodes: PropTypes.array,
-  zoom: PropTypes.number,
 };
 
 export default Map;

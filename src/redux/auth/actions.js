@@ -11,8 +11,10 @@ import {
 export function initAuth(user) {
   return (dispatch) => {
     dispatch({ type: INIT_AUTH, payload: user });
-    if (user.email != null) {
-      dispatch(handleDomain(user.email));
+    if (user != null) {
+      if (user.email != null) {
+        dispatch(handleDomain(user.email));
+      }
     }
   };
 }
@@ -37,10 +39,10 @@ export function signOutSuccess() {
   };
 }
 
-export function handleResources(domain) {
+export function handleResources(resources, domain) {
   return {
     type: HANDLE_RESOURCES,
-    payload: domain
+    payload: { resources, domain }
   };
 }
 
@@ -52,17 +54,13 @@ export function handleDomain(email) {
     const ref = firebase.database().ref('domains/');
     ref.once('value', ((snapshot) => {
       const child = snapshot.child(domain);
-      console.log('fdas');
       if (child.exists()) {
-        console.log('vasd');
         const resources = child.val();
-        console.log(resources);
-        dispatch(handleResources(resources));
+        dispatch(handleResources(resources, domain));
       } else {
         const entry = {};
-        entry[domain] = { users: 1 };
-        console.log(entry);
-        ref.set(entry);
+        entry[domain] = { valid: false };
+        ref.update(entry);
       }
     }));
   };

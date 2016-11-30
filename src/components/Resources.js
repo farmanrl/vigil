@@ -1,49 +1,52 @@
 import React, { Component, PropTypes } from 'react';
-import { Panel, Well } from 'react-bootstrap';
+import { Panel } from 'react-bootstrap';
 
 class Resources extends Component {
   static propTypes = {
-    resources: PropTypes.object.isRequired,
+    resources: PropTypes.object,
   }
 
   render() {
     if (this.props.resources) {
       return (
         <div>
+          {this.props.resources.get('valid') &&
           <Panel>
+            <img
+                src={this.props.resources.get('image')}
+                role="presentation"
+                style={{ height: 120 }}
+            />
             <h1>{this.props.resources.get('name')}</h1>
-            <br />
             <h2>Security</h2>
             <h4>{this.props.resources.get('security')}</h4>
-            <a href={this.props.resources.get('website')}><h3>Website</h3></a>
-            <a href={this.props.resources.get('help')}><h3>Get Help</h3></a>
+            <hr />
+            <a href={this.props.resources.get('info')}>
+              <h4>Information</h4>
+            </a>
+            <hr />
+            <a href={this.props.resources.get('support')}>
+              <h4>Get Help</h4>
+            </a>
           </Panel>
-          <Well>
-            <a href="http://www.cdc.gov/violenceprevention/sexualviolence/prevention.html">
-              <h3>Sexual Violence Prevention</h3>
-            </a>
-            <a href="https://www.rainn.org/about-national-sexual-assault-telephone-hotline">
-              <h3>Sexual Violence Hotline</h3>
-            </a>
-          </Well>
+          }
+          {!this.props.resources.get('valid') &&
+          <Panel>
+            <h3>No resources available</h3>
+            <p>We will add support for your domain as soon as possible!</p>
+            <p><strong>.edu</strong> domains will be given priority for extended functionality.</p>
+          </Panel>
+          }
         </div>
       );
     }
     return (
       <div>
         <Panel>
-          <h3>Sign in with email for resources personalized to your domain</h3>
-          <p>We will provide support for as many users as we can</p>
+          <h3>Sign in for resources personalized to your domain</h3>
+          <p>We will provide support for as many users as we can.</p>
+          <p><strong>.edu</strong> domains will be given priority for extended functionality.</p>
         </Panel>
-
-        <Well>
-          <a href="http://www.cdc.gov/violenceprevention/sexualviolence/prevention.html">
-            <h3>Sexual Violence Prevention</h3>
-          </a>
-          <a href="https://www.rainn.org/about-national-sexual-assault-telephone-hotline">
-            <h3>Sexual Violence Hotline</h3>
-          </a>
-        </Well>
       </div>
     );
   }

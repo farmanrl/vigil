@@ -3,7 +3,6 @@ import thunk from 'redux-thunk';
 import reducers from './reducers';
 
 export default (initialState = {}) => {
-  console.log('initializing store');
   let middleware = applyMiddleware(thunk);
   const store = createStore(reducers, initialState, middleware);
 

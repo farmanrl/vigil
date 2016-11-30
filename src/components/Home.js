@@ -12,9 +12,9 @@ class Home extends Component {
 
   render() {
     return (
-      <div>
+      <div style={{backgroundColor: '#333'}}>
         <Resources resources={this.props.auth.resources} />
-        <Information />
+        <Information anon={this.props.auth.isAnon} />
       </div>
     );
   }

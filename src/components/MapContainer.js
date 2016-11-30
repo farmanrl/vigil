@@ -20,12 +20,19 @@ class MapContainer extends Component {
       filter: 'all',
       start: 0,
       showModal: false,
+      location: null,
       key: null
     };
   }
 
   componentDidMount() {
     this.getNodes();
+    navigator.geolocation.getCurrentPosition((position) => {
+      const coords = {
+        lat: position.coords.latitude, lng: position.coords.longitude
+      };
+      this.setState({ location: coords });
+    });
   }
 
   getNodes = () => {
@@ -65,7 +72,6 @@ class MapContainer extends Component {
   }
 
   handleSelect = (key) => {
-    console.log('unblessed', key);
     const time = Date.now();
     switch (key) {
       case 'day': {
@@ -97,7 +103,6 @@ class MapContainer extends Component {
   }
 
   render() {
-    console.log('nodestate',this.state.nodes);
     const addNodeDisabledTip = (
       <Tooltip id="tooltip">You must login to report location</Tooltip>
     );
@@ -134,8 +139,9 @@ class MapContainer extends Component {
           </Modal.Header>
 
           <Modal.Body>
-            <p>Your location will be logged anonymously in our database.</p>
-            <p>This spot will be displayed to other users as a warning.</p>
+            <p>Your location will be logged anonymously in our database as a dangerous spot.</p>
+            <p>A marker will be displayed to other users as a warning.</p>
+            <p>This action cannot be undone, so report at your discretion.</p>
             <p>If you wish to continue, submit your location, and stay safe!</p>
           </Modal.Body>
 
@@ -169,9 +175,7 @@ class MapContainer extends Component {
         <Map
             key={this.state.key}
             location={this.state.location}
-            center={this.state.center}
             nodes={this.state.nodes}
-            zoom={this.state.zoom}
         />
       </div>
     );

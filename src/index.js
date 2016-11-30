@@ -10,7 +10,6 @@ const store = configureStore();
 const rootElement = document.getElementById('root');
 
 function render(Root) {
-  console.log('rendering');
   ReactDOM.render(
     <Root store={store} history={browserHistory} />,
     rootElement

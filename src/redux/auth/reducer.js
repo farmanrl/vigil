@@ -5,11 +5,11 @@ export const AuthState = new Record({
   authenticated: false,
   id: null,
   isAnon: null,
+  domain: null,
   resources: null,
 });
 
 export function authReducer(state = new AuthState(), { payload, type }) {
-  console.log(payload, type);
   switch (type) {
     case INIT_AUTH:
     case SIGN_IN_SUCCESS:
@@ -20,9 +20,9 @@ export function authReducer(state = new AuthState(), { payload, type }) {
       });
 
     case HANDLE_RESOURCES:
-      console.log('handle_resources', payload);
       return state.merge({
-        resources: payload
+        domain: payload.domain,
+        resources: payload.resources,
       });
     case SIGN_OUT_SUCCESS:
       return new AuthState();
