@@ -2,14 +2,36 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 80px;
+.Header-logo {
+  height: 60px;
 }
 
-.App-header {
+.Header {
   background-color: #222;
   height: 80px;
   color: white;
+}
+
+.Header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 3% 0px 0px;
+}
+
+.Header-brand {
+    display: flex;
+    width: 160px;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.Header-controls {
+    display: flex;
+    width: 180px;
+    align-items: center;
+    justify-content: space-around;
+    margin-right: 20px;
 }
 
 h2 {
@@ -85,4 +107,13 @@ h2 {
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+@media (max-width: 370px){
+    .Header-title {
+        display: none;
+    }
+    .Header-brand {
+        width: 80px;
+    }
 }

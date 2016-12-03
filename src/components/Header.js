@@ -1,11 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import { Button, Glyphicon, OverlayTrigger, Tooltip, Modal } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
+import './App.css';
 
 class Header extends Component {
   static propTypes = {
     authenticated: PropTypes.bool.isRequired,
-    signOut: PropTypes.func.isRequired
+    signOut: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -30,41 +31,17 @@ class Header extends Component {
         <Tooltip id="tooltip"><strong>Open Home</strong></Tooltip>
       );
       return (
-        <div className="App-header">
-          <div
-              style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '5px 3% 0px 0px'
-                }}
-          >
-            <div
-                style={{
-                    display: 'flex',
-                    width: 170,
-                    alignItems: 'center',
-                    justifyContent: 'space-around'
-                  }}
-                onClick={this.open}
-            >
+        <div className="Header">
+          <div className="Header-bar">
+            <div className="Header-brand" onClick={this.open}>
               <img
                   src={require("./vigil.png")}
-                  className="App-logo"
+                  className="Header-logo"
                   alt="logo"
-                  style={{ height: 60 }}
               />
-              <h2>VIGIL</h2>
+              <h2 className="Header-title">VIGIL</h2>
             </div>
-            <div
-                style={{
-                    display: 'flex',
-                    width: 150,
-                    alignItems: 'center',
-                    justifyContent: 'space-around',
-                    marginRight: 20
-                  }}
-            >
+            <div className="Header-controls">
               <Button bsSize="sm" onClick={this.props.signOut} >
                 Sign Out
               </Button>
@@ -72,7 +49,7 @@ class Header extends Component {
                 <Button
                     bsSize="lg"
                     bsStyle="link"
-                    style={{ fontSize: 24, paddingTop: 20 }}
+                    style={{ fontSize: 24, paddingTop: 20, marginLeft: 12 }}
                     onClick={() => browserHistory.replace('/map')}
                 >
                   <Glyphicon glyph="glyphicon glyphicon-map-marker" />

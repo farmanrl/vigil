@@ -9,7 +9,7 @@ class Information extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { text: null };
+    this.state = { text: '' };
   }
 
   submit = () => {
@@ -18,12 +18,12 @@ class Information extends Component {
     let updates = {};
     updates['/feedback/' + key] = this.state.text;
     firebase.database().ref().update(updates);
+    this.setState({ text: '' });
   }
 
   handleChange = (event) => {
     this.setState({ text: event.target.value });
   }
-
 
   render() {
     return (
@@ -74,6 +74,7 @@ class Information extends Component {
               <ControlLabel>Tell us what you think!</ControlLabel>
               <FormControl
                   componentClass="textarea"
+                  value={this.state.text}
                   placeholder="Feedback"
                   onChange={this.handleChange}
               />
