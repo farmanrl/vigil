@@ -7,7 +7,7 @@ import Home from './Home';
 export const paths = {
   ROOT: '/',
   SIGN_IN: '/sign-in',
-  MAP: '/map',
+  MAP: '/heatmap',
   HOME: '/home',
 };
 

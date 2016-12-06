@@ -34,6 +34,7 @@ class App extends Component {
         <Header
             signOut={this.props.signOut}
             authenticated={this.props.auth.authenticated}
+            route={location.pathname}
         />
         <main className="main">{this.props.children}</main>
       </div>
