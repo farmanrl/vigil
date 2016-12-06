@@ -21,21 +21,27 @@
 
 .Header-brand {
     display: flex;
-    width: 160px;
+    width: 180px;
     align-items: center;
     justify-content: space-around;
+    color: white;
+}
+
+.Header-subtitle {
+    margin: 0;
+    color: white;
 }
 
 .Header-controls {
     display: flex;
-    width: 180px;
+    width: 140px;
     align-items: center;
     justify-content: space-around;
-    margin-right: 20px;
 }
 
 h2 {
-    margin: 0
+    margin: 0;
+    color: white;
 }
 
 .App-intro {
@@ -86,34 +92,25 @@ h2 {
 }
 
 .App-getLocation {
-  background-color:#F44336;
+  background-color:#337ab7;
   width:30px;
   height:30px;
   border-radius:100%;
-  background:#F44336;
+  background:#337ab7;
   border:none;
   outline:none;
   color:#FFF;
-  font-size:24px;
+  font-size:14px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   transition:.3s;
   -webkit-tap-highlight-color: rgba(0,0,0,0);
   position: fixed;
   bottom: 40px;
-  right: 120px;
+  right: 130px;
   z-index: 10000
 }
 
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
-}
-
-@media (max-width: 370px){
-    .Header-title {
-        display: none;
-    }
-    .Header-brand {
-        width: 80px;
-    }
 }

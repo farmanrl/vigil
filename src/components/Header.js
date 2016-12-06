@@ -5,6 +5,7 @@ import './App.css';
 
 class Header extends Component {
   static propTypes = {
+    route: PropTypes.string.isRequired,
     authenticated: PropTypes.bool.isRequired,
     signOut: PropTypes.func.isRequired,
   };
@@ -33,28 +34,35 @@ class Header extends Component {
       return (
         <div className="Header">
           <div className="Header-bar">
-            <div className="Header-brand" onClick={this.open}>
+            <Button className="Header-brand" bsStyle="link" onClick={this.open}>
               <img
                   src={require("./vigil.png")}
                   className="Header-logo"
                   alt="logo"
               />
-              <h2 className="Header-title">VIGIL</h2>
-            </div>
+              <div>
+                <h2 className="Header-title">VIGIL</h2>
+                <h5 className="Header-subtitle">Beta</h5>
+              </div>
+            </Button>
             <div className="Header-controls">
               <Button bsSize="sm" onClick={this.props.signOut} >
                 Sign Out
               </Button>
+              {this.props.route === '/home' ?
               <OverlayTrigger placement="bottom" overlay={mapTip}>
                 <Button
                     bsSize="lg"
                     bsStyle="link"
-                    style={{ fontSize: 24, paddingTop: 20, marginLeft: 12 }}
-                    onClick={() => browserHistory.replace('/map')}
+                    style={{ fontSize: 24, paddingTop: 20 }}
+                    onClick={() => browserHistory.replace('/heatmap')}
                 >
                   <Glyphicon glyph="glyphicon glyphicon-map-marker" />
                 </Button>
               </OverlayTrigger>
+              : null
+              }
+              {this.props.route === '/heatmap' ?
               <OverlayTrigger placement="bottom" overlay={homeTip}>
                 <Button
                     bsSize="lg"
@@ -65,18 +73,22 @@ class Header extends Component {
                   <Glyphicon glyph="glyphicon glyphicon-menu-hamburger" />
                 </Button>
               </OverlayTrigger>
+               : null
+              }
             </div>
           </div>
           <Modal show={this.state.showModal} onHide={this.close}>
             <Modal.Header closeButton>
-              <Modal.Title>VIGIL - Prototype</Modal.Title>
+              <Modal.Title>VIGIL - Beta Prototype</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <h4>Created by Richard Farman</h4>
-              <p>Computer Science Student at Whitman College</p>
-              <p>Product Design/Development</p>
-              <p>VIGIL is under ungoing development, and is subject to changes in scope and vision.</p>
-              <p>Contact me if you're interested in connecting!</p>
+              <h3>Created by Richard Farman</h3>
+              <h4>Software Development, Multimedia Production</h4>
+              <h4>Computer Science Student at Whitman College</h4>
+              <hr />
+              <p>VIGIL is under ungoing development, and is subject to change in scope and vision.</p>
+              <p>Contact me if you are interested in getting involved!</p>
+              <p>farmanrl@whitman.edu</p>
             </Modal.Body>
             <Modal.Footer>
               <a href="https://www.linkedin.com/in/farmanrl">
@@ -94,6 +106,7 @@ class Header extends Component {
 }
 
 Header.PropTypes = {
+  route: PropTypes.string.isRequired,
   authenticated: PropTypes.bool.isRequired,
   signOut: PropTypes.func.isRequired
 };
