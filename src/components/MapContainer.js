@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { authActions, getAuth } from '../redux/auth';
-import { Nav, NavItem, Modal, Button, Glyphicon, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Nav, NavItem, Modal, Button, Glyphicon, OverlayTrigger, Tooltip, FormGroup, ControlLabel, Panel, Checkbox, Radio } from 'react-bootstrap';
 import firebase from 'firebase';
 import Map from './Map';
 import './App.css';
@@ -21,7 +21,12 @@ class MapContainer extends Component {
       start: 0,
       showModal: false,
       location: null,
-      key: null
+      key: null,
+      reasons: {
+        behavior: null,
+        environment: null,
+      },
+      danger: null,
     };
   }
 
@@ -32,6 +37,15 @@ class MapContainer extends Component {
         lat: position.coords.latitude, lng: position.coords.longitude
       };
       this.setState({ location: coords });
+    });
+  }
+
+  getLocation = () => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const coords = {
+        lat: position.coords.latitude, lng: position.coords.longitude
+      };
+      this.setState({ location: coords, key: Date.now() });
     });
   }
 
@@ -55,6 +69,19 @@ class MapContainer extends Component {
       const lng = position.coords.longitude;
       const timestamp = firebase.database.ServerValue.TIMESTAMP;
       const node = { lat, lng, timestamp };
+      if (this.state.reasons) {
+        const reasons = [];
+        if (this.state.reasons['environment'] === true) {
+          reasons.push('environment');
+        }
+        if (this.state.reasons['behavior'] === true) {
+          reasons.push('behavior');
+        }
+        node.reasons = reasons;
+      }
+      if (this.state.danger) {
+        node.danger = this.state.danger;
+      }
       const updates = {};
       updates[`/nodes/${id}`] = node;
       firebase.database().ref().update(updates)
@@ -63,15 +90,24 @@ class MapContainer extends Component {
     this.close();
   }
 
+  handleCheck = (key) => {
+    const state = this.state.reasons;
+    state[key] = !this.state.reasons[key];
+    this.setState({ reasons: state });
+  }
+
   close = () => {
-    this.setState({ showModal: false });
+    const reasons = this.state.reasons;
+    reasons['environment'] = null;
+    reasons['behavior'] = null;
+    this.setState({ reasons, danger: null, showModal: false });
   }
 
   open = () => {
     this.setState({ showModal: true });
   }
 
-  handleSelect = (key) => {
+  handleFilter = (key) => {
     const time = Date.now();
     switch (key) {
       case 'day': {
@@ -107,14 +143,17 @@ class MapContainer extends Component {
       <Tooltip id="tooltip">You must login to report location</Tooltip>
     );
     const addNodeTip = (
-      <Tooltip id="tooltip">Report your location</Tooltip>
+      <Tooltip id="tooltip">Report location</Tooltip>
+    );
+    const getLocationTip = (
+      <Tooltip id="tooltip">Get location</Tooltip>
     );
     return (
       <div>
         <Nav
             bsStyle="pills"
             justified
-            onSelect={this.handleSelect}
+            onSelect={this.handleFilter}
             activeKey={this.state.filter}
         >
           <NavItem eventKey="day">
@@ -135,14 +174,53 @@ class MapContainer extends Component {
         </Nav>
         <Modal show={this.state.showModal} onHide={this.close}>
           <Modal.Header closeButton>
-            <Modal.Title>Submit Location</Modal.Title>
+            <Modal.Title>Report Location</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
-            <p>Your location will be logged anonymously in our database as a dangerous spot.</p>
+            <p>Your location will be logged anonymously in our database.</p>
             <p>A marker will be displayed to other users as a warning.</p>
-            <p>This action cannot be undone, so report at your discretion.</p>
-            <p>If you wish to continue, submit your location, and stay safe!</p>
+            <p>This action cannot be undone, so use at your discretion.</p>
+            <p>If you wish to continue, submit and stay safe!</p>
+
+            <FormGroup>
+              <ControlLabel>Optional Information</ControlLabel>
+              <Panel>
+                <ControlLabel>Reasons</ControlLabel>
+                <Checkbox onChange={() => this.handleCheck('environment')}>
+                  Environment
+                </Checkbox>
+                <Checkbox onChange={() => this.handleCheck('behavior')}>
+                  Behavior
+                </Checkbox>
+                <br />
+                <ControlLabel>Danger</ControlLabel>
+                <br />
+                <Radio
+                    inline
+                    checked={this.state.danger === 'low'}
+                    onChange={() => this.setState({ danger: 'low' })}
+                >
+                  Low
+                </Radio>
+                <Radio
+                    inline
+                    checked={this.state.danger === 'medium'}
+                    onChange={() => this.setState({ danger: 'medium' })}
+                >
+                  Medium
+                </Radio>
+                <Radio
+                    inline
+                    checked={this.state.danger === 'high'}
+                    onChange={() => this.setState({ danger: 'high' })}
+                >
+                  High
+                </Radio>
+              </Panel>
+              <p>These options are placeholder and not final!</p>
+            </FormGroup>
+
           </Modal.Body>
 
           <Modal.Footer>
@@ -152,7 +230,7 @@ class MapContainer extends Component {
 
         </Modal>
 
-        {!this.state.showModal && this.props.auth.isAnon &&
+        {!this.state.showModal && this.props.auth.isAnon ?
         <OverlayTrigger placement="top" overlay={addNodeDisabledTip}>
           <button
               className="App-addNode-disabled"
@@ -161,8 +239,8 @@ class MapContainer extends Component {
             <Glyphicon glyph="flag" />
           </button>
         </OverlayTrigger>
-        }
-        {!this.state.showModal && !this.props.auth.isAnon &&
+        : null}
+        {!this.state.showModal && !this.props.auth.isAnon ?
         <OverlayTrigger placement="top" overlay={addNodeTip}>
           <button
               className="App-addNode"
@@ -171,7 +249,17 @@ class MapContainer extends Component {
             <Glyphicon glyph="flag" />
           </button>
         </OverlayTrigger>
-        }
+        : null}
+        {!this.state.showModal ?
+        <OverlayTrigger placement="top" overlay={getLocationTip}>
+          <button
+              className="App-getLocation"
+              onClick={this.getLocation}
+          >
+            <Glyphicon glyph="glyphicon glyphicon-map-marker" />
+          </button>
+        </OverlayTrigger>
+        : null}
         <Map
             key={this.state.key}
             location={this.state.location}

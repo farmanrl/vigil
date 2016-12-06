@@ -18,7 +18,7 @@ class Resources extends Component {
                 style={{ height: 120 }}
             />
             <h1>{this.props.resources.get('name')}</h1>
-            <h2>Security</h2>
+            <h2 style={{ color: '#333' }}>Security</h2>
             <h4>{this.props.resources.get('security')}</h4>
             <hr />
             <a href={this.props.resources.get('info')}>
@@ -26,7 +26,11 @@ class Resources extends Component {
             </a>
             <hr />
             <a href={this.props.resources.get('support')}>
-              <h4>Get Help</h4>
+              <h4>Find Help</h4>
+            </a>
+            <hr />
+            <a href={this.props.resources.get('involved')}>
+              <h4>Get Involved</h4>
             </a>
           </Panel>
           }
