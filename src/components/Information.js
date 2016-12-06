@@ -36,25 +36,54 @@ class Information extends Component {
           <a href="https://www.rainn.org/about-national-sexual-assault-telephone-hotline">
             <h4>Sexual Violence Hotline</h4>
           </a>
+          <hr />
+          <a href="https://www.rainn.org/articles/what-is-consent">
+            <h4>About Consent</h4>
+          </a>
+          <hr />
+          <a href="http://hams.cc/students/">
+            <h4>Harm Reduction</h4>
+          </a>
+          <hr />
+          <a href="https://www.livethegreendot.com/">
+            <h4>Live the Green Dot</h4>
+          </a>
         </Panel>
         <Panel header="About" eventKey="about">
-          <p>VIGIL is a web-based application that displays a density heatmap of locations where users have reported their location as unsafe.
+          <p>
+            VIGIL is a web-based application that displays a heatmap of locations where users have reported their location as unsafe.
           </p>
-          <p>VIGIL was developed as both a preventative platform against sexual violence and other dangerous situations, as well as an action and support system for victims and responsible individuals.
+          <p>
+            VIGIL was developed as both a preventative platform against sexual violence and other dangerous situations, as well as an action and support system for victims and advocates.
           </p>
-          <p>Users can view the map and see when and where others have reported their locations, and report their own location if they feel unsafe.
+          <p>
+            Users can view the map and see when and where others have reported their locations, and report their own location if they feel unsafe, with the option of providing additional information.
           </p>
-          <p>All our data gathered from users will be rendered in a heatmap that shows the position and frequency of reported locations, with the ability to filter by time.
+          <p>
+            All our data gathered from users will be rendered in a heatmap that shows the position and frequency of reported locations, with the ability to filter by time.
           </p>
-          <p>As always, rely on your own judgement, but feel free to use our application to stay aware of where you are, and to report if you encounter a situation that you would want other users to avoid.
+          <p>
+            As a location receives more reports, the color of the map will change from green, to yellow, to red according to the density of reports at that location.
           </p>
-          <p>I hope users will use this app to their benefit, as well as share it with others to spread awareness and alertness to their friends and across communities.
+          <p>
+            You can click on a particular location to see if there's more detailed information about why this location was reported.
           </p>
-          <p>VIGIL was inspired by my experiences and conversations with friends, colleagues, and peers across my first few years of college. Despite rising awareness, there is still much gender and racial discrimination in our society that leads to hatred and violence. Let's do our best to work together and end it!</p>
+          <p>
+            As always, rely on your own judgement, but feel free to use our application to stay aware of where you are, and to report if you encounter a situation that you would want other users to avoid.
+          </p>
+          <p>
+            I hope users will use this app to their benefit, as well as share it with others to spread awareness and alertness to their friends and across communities.
+          </p>
+          <p>
+            VIGIL was inspired by my experiences and conversations with friends, colleagues, and peers across my first few years of college.
+          </p>
+          <p>
+            Despite rising awareness, there is still much gender and racial discrimination in our society that leads to hatred and violence. Let's do our best to work together and end it!
+          </p>
           <strong>All user information and locations are anonymous.</strong>
         </Panel>
         <Panel header="Support" eventKey="support">
-          <p>Developing and releasing an application always costs time and money, and as the sole developer of this platform, I'm always running short of each.
+          <p>Developing and deploying an application always costs time and money, and as the sole developer of this platform, I am always running short of each.
           </p>
           <p>Since managing a large-scale application with authentication, databasing, hosting, geolocation, and other features can be costly, I will need help to support as many users as possible.
           </p>
