@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Button, Glyphicon, OverlayTrigger, Tooltip, Modal } from 'react-bootstrap';
+import { Button, Glyphicon, OverlayTrigger, Tooltip, Modal, Label } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
 import './App.css';
 
@@ -42,7 +42,7 @@ class Header extends Component {
               />
               <div>
                 <h2 className="Header-title">VIGIL</h2>
-                <h5 className="Header-subtitle">Beta</h5>
+                <h5 className="Header-subtitle"><Label>Beta</Label></h5>
               </div>
             </Button>
             <div className="Header-controls">
@@ -86,7 +86,7 @@ class Header extends Component {
               <h4>Software Development, Multimedia Production</h4>
               <h4>Computer Science Student at Whitman College</h4>
               <hr />
-              <p>VIGIL is under ungoing development, and is subject to change in scope and vision.</p>
+              <p>VIGIL is under ongoing development, and is subject to change in scope and vision.</p>
               <p>Contact me if you are interested in getting involved!</p>
               <p>farmanrl@whitman.edu</p>
             </Modal.Body>

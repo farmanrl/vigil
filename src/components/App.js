@@ -32,9 +32,9 @@ class App extends Component {
     return (
       <div className="App">
         <Header
-            signOut={this.props.signOut}
-            authenticated={this.props.auth.authenticated}
-            route={location.pathname}
+          signOut={this.props.signOut}
+          authenticated={this.props.auth.authenticated}
+          route={location.pathname}
         />
         <main className="main">{this.props.children}</main>
       </div>

@@ -9,5 +9,5 @@ const config = {
 };
 
 export const firebaseApp = firebase.initializeApp(config);
-export const firebaseAuth = firebaseApp.auth();
-export const firebaseDatabase = firebaseApp.database();
+export const auth = firebaseApp.auth();
+export const database = firebaseApp.database();

@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import firebase from 'firebase';
-import { Button, Accordion, Panel, form, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import { Button, Accordion, Panel, FormGroup, ControlLabel, FormControl, ListGroup, ListGroupItem } from 'react-bootstrap';
 
 class Information extends Component {
   static propTypes = {
@@ -15,7 +15,7 @@ class Information extends Component {
   submit = () => {
     const feedback = firebase.database().ref().child('feedback/');
     const key = feedback.push().key;
-    let updates = {};
+    const updates = {};
     updates['/feedback/' + key] = this.state.text;
     firebase.database().ref().update(updates);
     this.setState({ text: '' });
@@ -29,25 +29,23 @@ class Information extends Component {
     return (
       <Accordion>
         <Panel header="Resources" eventKey="resources">
-          <a href="http://www.cdc.gov/violenceprevention/sexualviolence/prevention.html">
-            <h4>Sexual Violence Prevention</h4>
-          </a>
-          <hr />
-          <a href="https://www.rainn.org/about-national-sexual-assault-telephone-hotline">
-            <h4>Sexual Violence Hotline</h4>
-          </a>
-          <hr />
-          <a href="https://www.rainn.org/articles/what-is-consent">
-            <h4>About Consent</h4>
-          </a>
-          <hr />
-          <a href="http://hams.cc/students/">
-            <h4>Harm Reduction</h4>
-          </a>
-          <hr />
-          <a href="https://www.livethegreendot.com/">
-            <h4>Live the Green Dot</h4>
-          </a>
+          <ListGroup>
+            <ListGroupItem href="http://www.cdc.gov/violenceprevention/sexualviolence/prevention.html" header="Sexual Violence Prevention">
+              Everything you need to know about how to prevent sexual violence
+            </ListGroupItem>
+            <ListGroupItem href="https://www.rainn.org/about-national-sexual-assault-telephone-hotline" header="Sexual Violence Hotline">
+              Get immediate support through RAINN's national telephone hotline
+            </ListGroupItem>
+            <ListGroupItem href="https://www.rainn.org/articles/what-is-consent" header="About Consent">
+              Learn what it means to give and recieve consent
+            </ListGroupItem>
+            <ListGroupItem href="http://hams.cc/students/" header="Harm Reduction">
+              Learn techniques for minimizing health risks for yourself and others
+            </ListGroupItem>
+            <ListGroupItem href="https://www.livethegreendot.com/" header="Live the Green Dot">
+              Join the movement that inspired this application
+            </ListGroupItem>
+          </ListGroup>
         </Panel>
         <Panel header="About" eventKey="about">
           <p>

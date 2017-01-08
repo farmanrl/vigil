@@ -43,4 +43,8 @@
     "jsx-a11y",
     "import"
   ],
+    "globals": {
+    "google": false,
+  }
+
 }

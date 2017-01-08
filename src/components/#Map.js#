@@ -279,10 +279,9 @@ class Map extends Component {
       const style = silver;
     } else if (this.props.style === 'aubergine') {
       const style = aubergine;
+    } else {
+      const style = dark;
     }
-  } else {
-    const style = dark;
-  }
     console.log('map props', this.props);
     return (
       <div style={{ position: 'absolute', top: 120, bottom: 0, width: '100%', color: 'white' }}>

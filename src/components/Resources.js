@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Panel } from 'react-bootstrap';
+import { Panel, ListGroup, ListGroupItem, Label } from 'react-bootstrap';
 
 class Resources extends Component {
   static propTypes = {
@@ -18,27 +18,27 @@ class Resources extends Component {
                 style={{ height: 120 }}
             />
             <h1>{this.props.resources.get('name')}</h1>
-            <h2 style={{ color: '#333' }}>Security</h2>
-            <h4>{this.props.resources.get('security')}</h4>
-            <hr />
-            <a href={this.props.resources.get('info')}>
-              <h4>Information</h4>
-            </a>
-            <hr />
-            <a href={this.props.resources.get('support')}>
-              <h4>Find Help</h4>
-            </a>
-            <hr />
-            <a href={this.props.resources.get('involved')}>
-              <h4>Get Involved</h4>
-            </a>
+            <h3 style={{marginTop: 0}}>Security</h3>
+            <h3 style={{marginTop: 0}}>{this.props.resources.get('security')}</h3>
+            <ListGroup>
+              <ListGroupItem header="Information" href={this.props.resources.get('info')}>
+                View the services that campus security provides
+              </ListGroupItem>
+              <ListGroupItem header="Find Support" href={this.props.resources.get('support')}>
+                Find help and report offenses
+              </ListGroupItem>
+              <ListGroupItem header="Get Involved" href={this.props.resources.get('involved')}>
+                Learn how you can support the cause
+              </ListGroupItem>
+            </ListGroup>
           </Panel>
           }
           {!this.props.resources.get('valid') &&
           <Panel>
             <h3>No resources available</h3>
+            <p>Resources are provided based on email domain name.</p>
             <p>We will add support for your domain as soon as possible!</p>
-            <p><strong>.edu</strong> domains will be given priority for extended functionality.</p>
+            <p><Label>.edu</Label> domains will be given priority.</p>
           </Panel>
           }
         </div>
@@ -47,9 +47,10 @@ class Resources extends Component {
     return (
       <div>
         <Panel>
-          <h3>Sign in for resources personalized to your domain</h3>
+          <h3>Sign in for more resources</h3>
+          <p>Resources are provided based on email domain name.</p>
           <p>We will provide support for as many users as we can.</p>
-          <p><strong>.edu</strong> domains will be given priority for extended functionality.</p>
+          <p><Label>.edu</Label> domains will be given priority.</p>
         </Panel>
       </div>
     );

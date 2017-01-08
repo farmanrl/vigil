@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Label } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { authActions } from '../redux/auth';
 
@@ -12,8 +12,8 @@ export function SignIn({ signInWithGoogle, signInAnon }) {
           alt="logo"
           style={{ height: 200, paddingTop: 12 }}
       />
-      <h1>VIGIL</h1>
-      <h4>Beta</h4>
+      <h1>VIGIL <h4><Label>Beta</Label></h4></h1>
+      <h5>By using this app, you agree to our <a href="https://media.termsfeed.com/pdf/eula-template.pdf">EULA</a></h5>
       <br />
       <Button bsSize="lg" onClick={signInWithGoogle}>
         Sign In
@@ -30,7 +30,6 @@ export function SignIn({ signInWithGoogle, signInAnon }) {
       <br />
       <h4>You will not be able to report your location, or access additional resources for domains.</h4>
       <br />
-      <h5>Add page to home screen to use as an app!</h5>
       <h5>VIGIL is under ongoing development and subject to change.</h5>
       <h5>Created by Richard Farman</h5>
     </div>

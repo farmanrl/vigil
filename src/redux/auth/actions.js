@@ -1,17 +1,19 @@
 import firebase from 'firebase';
-import { firebaseAuth } from '../firebase';
+import { auth } from '../firebase';
 import {
   INIT_AUTH,
   SIGN_IN_ERROR,
   SIGN_IN_SUCCESS,
   SIGN_OUT_SUCCESS,
-  HANDLE_RESOURCES
+  HANDLE_RESOURCES,
+  HANDLE_INFO,
 } from './types';
 
 export function initAuth(user) {
   return (dispatch) => {
     dispatch({ type: INIT_AUTH, payload: user });
     if (user != null) {
+      dispatch(handleUser(user));
       if (user.email != null) {
         dispatch(handleDomain(user.email));
       }
@@ -46,6 +48,22 @@ export function handleResources(resources, domain) {
   };
 }
 
+export function handleUserInfo(info) {
+  return {
+    type: HANDLE_INFO,
+    payload: info,
+  };
+}
+
+export function handleUser(user) {
+  return (dispatch) => {
+    firebase.database().ref(`users/${user.uid}`)
+            .once('value', ((snapshot) => {
+              dispatch(handleUserInfo(snapshot.val()));
+            }));
+  };
+}
+
 export function handleDomain(email) {
   let domain = email.replace(/.*@/, '');
   const index = domain.indexOf('.');
@@ -70,12 +88,12 @@ export function signInWithGoogle() {
   return (dispatch) => {
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.addScope('email');
-    firebaseAuth.signInWithPopup(provider)
-                .then((result) => {
-                  dispatch(signInSuccess(result));
-                  dispatch(handleDomain(result.user.email));
-                })
-                .catch(error => dispatch(signInError(error)));
+    auth.signInWithPopup(provider)
+        .then((result) => {
+          dispatch(signInSuccess(result));
+          dispatch(handleDomain(result.user.email));
+        })
+        .catch(error => dispatch(signInError(error)));
   };
 }
 
@@ -90,7 +108,7 @@ export function signInAnon() {
 
 export function signOut() {
   return (dispatch) => {
-    firebaseAuth.signOut()
-                .then(() => dispatch(signOutSuccess()));
+    auth.signOut()
+        .then(() => dispatch(signOutSuccess()));
   };
 }

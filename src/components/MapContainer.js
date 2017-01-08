@@ -1,281 +1,159 @@
 import React, { Component, PropTypes } from 'react';
+import firebase from 'firebase';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { authActions, getAuth } from '../redux/auth';
-import { Nav, NavItem, Modal, Button, Glyphicon, OverlayTrigger, Tooltip, FormGroup, ControlLabel, Panel, Checkbox, Radio } from 'react-bootstrap';
-import firebase from 'firebase';
-import Map from './Map';
+import {
+  getNodes,
+  nodesActions,
+} from '../redux/nodes';
+import { getAuth } from '../redux/auth';
+
+import Filters from './Filters';
+import Map from './GoogleMap';
+import Controls from './Controls';
+import Safe from './Safe';
+import Danger from './Danger';
+import Customize from './Customize';
+import Contacts from './Contacts';
+import Directions from './Directions';
+import Location from './Location';
+import Reports from './Reports';
+
 import './App.css';
 import './MapContainer.css';
 
+const GoogleMapsLoader = require('google-maps');
+
+GoogleMapsLoader.KEY = 'AIzaSyD9bTn4_tEC1z_97fgdBGzlNe0GziAnIu4';
+GoogleMapsLoader.LIBRARIES = ['visualization'];
+
 class MapContainer extends Component {
   static propTypes = {
-    auth: PropTypes.object.isRequired,
+    auth: PropTypes.object,
+    nodes: PropTypes.object,
+    loadNodes: PropTypes.func,
+    changeFilter: PropTypes.func,
+    update: PropTypes.func,
+    addNode: PropTypes.func,
+    showModal: PropTypes.func,
+    closeModal: PropTypes.func,
+    getRating: PropTypes.func,
+    getStyle: PropTypes.func,
+    setStyle: PropTypes.func,
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      nodes: null,
-      filter: 'all',
-      start: 0,
-      showModal: false,
-      location: null,
-      key: null,
-      reasons: {
-        behavior: null,
-        environment: null,
-      },
-      danger: null,
-    };
+  componentWillMount() {
+    this.props.update();
+    this.props.getStyle();
+    this.props.loadNodes();
   }
 
-  componentDidMount() {
-    this.getNodes();
-    navigator.geolocation.getCurrentPosition((position) => {
-      const coords = {
-        lat: position.coords.latitude, lng: position.coords.longitude
-      };
-      this.setState({ location: coords });
-    });
-  }
-
-  getLocation = () => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const coords = {
-        lat: position.coords.latitude, lng: position.coords.longitude
-      };
-      this.setState({ location: coords, key: Date.now() });
-    });
-  }
-
-  getNodes = () => {
-    firebase.database().ref('nodes/')
-            .once('value', (snapshot) => {
-              const nodes = [];
-              snapshot.forEach((data) => {
-                if (data.val().timestamp > this.state.start) {
-                  nodes.push(data.val());
-                }
-              });
-              this.setState({ nodes, key: Date.now() });
-            });
-  }
-
-  addNode = () => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const id = firebase.database().ref().child('/nodes').push().key;
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-      const timestamp = firebase.database.ServerValue.TIMESTAMP;
-      const node = { lat, lng, timestamp };
-      if (this.state.reasons) {
-        const reasons = [];
-        if (this.state.reasons['environment'] === true) {
-          reasons.push('environment');
-        }
-        if (this.state.reasons['behavior'] === true) {
-          reasons.push('behavior');
-        }
-        node.reasons = reasons;
-      }
-      if (this.state.danger) {
-        node.danger = this.state.danger;
-      }
-      const updates = {};
-      updates[`/nodes/${id}`] = node;
-      firebase.database().ref().update(updates)
-              .then(() => this.getNodes());
-    });
-    this.close();
-  }
-
-  handleCheck = (key) => {
-    const state = this.state.reasons;
-    state[key] = !this.state.reasons[key];
-    this.setState({ reasons: state });
-  }
-
-  close = () => {
-    const reasons = this.state.reasons;
-    reasons['environment'] = null;
-    reasons['behavior'] = null;
-    this.setState({ reasons, danger: null, showModal: false });
-  }
-
-  open = () => {
-    this.setState({ showModal: true });
-  }
-
-  handleFilter = (key) => {
-    const time = Date.now();
-    switch (key) {
-      case 'day': {
-        const day = 86400000;
-        this.setState({ filter: key, start: time - day }, this.getNodes());
-        break;
-      }
-      case 'week': {
-        const week = 604800000;
-        this.setState({ filter: key, start: time - week }, this.getNodes());
-        break;
-      }
-      case 'month': {
-        const month = 2629746000;
-        this.setState({ filter: key, start: time - month }, this.getNodes());
-        break;
-      }
-      case 'year': {
-        const year = 31536000000;
-        this.setState({ filter: key, start: time - year }, this.getNodes());
-        break;
-      }
-      case 'all':
-        this.setState({ filter: key, start: 0 }, this.getNodes());
-        break;
-      default:
-        this.setState({ filter: null, start: 0 }, this.getNodes());
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.nodes.filter !== this.props.nodes.filter) {
+      this.props.getStyle();
+      this.props.update();
+      this.props.loadNodes();
     }
   }
 
+  init = () => {
+    return (this.props.nodes.style &&
+            this.props.nodes.list &&
+            this.props.nodes.location &&
+            this.props.nodes.timestamp);
+  }
+
   render() {
-    const addNodeDisabledTip = (
-      <Tooltip id="tooltip">You must login to report location</Tooltip>
-    );
-    const addNodeTip = (
-      <Tooltip id="tooltip">Report location</Tooltip>
-    );
-    const getLocationTip = (
-      <Tooltip id="tooltip">Get location</Tooltip>
-    );
-    return (
-      <div>
-        <Nav
-            bsStyle="pills"
-            justified
-            onSelect={this.handleFilter}
-            activeKey={this.state.filter}
-        >
-          <NavItem eventKey="day">
-            Day
-          </NavItem>
-          <NavItem eventKey="week">
-            Week
-          </NavItem>
-          <NavItem eventKey="month">
-            Month
-          </NavItem>
-          <NavItem eventKey="year">
-            Year
-          </NavItem>
-          <NavItem eventKey="all">
-            All
-          </NavItem>
-        </Nav>
-        <Modal show={this.state.showModal} onHide={this.close}>
-          <Modal.Header closeButton>
-            <Modal.Title>Report Location</Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body>
-            <p>Your location will be logged anonymously in our database.</p>
-            <p>A marker will be displayed to other users as a warning.</p>
-            <p>This action cannot be undone, so use at your discretion.</p>
-            <p>If you wish to continue, submit and stay safe!</p>
-
-            <FormGroup>
-              <ControlLabel>Optional Information</ControlLabel>
-              <Panel>
-                <ControlLabel>Reasons</ControlLabel>
-                <Checkbox onChange={() => this.handleCheck('environment')}>
-                  Environment
-                </Checkbox>
-                <Checkbox onChange={() => this.handleCheck('behavior')}>
-                  Behavior
-                </Checkbox>
-                <br />
-                <ControlLabel>Danger</ControlLabel>
-                <br />
-                <Radio
-                    inline
-                    checked={this.state.danger === 'low'}
-                    onChange={() => this.setState({ danger: 'low' })}
-                >
-                  Low
-                </Radio>
-                <Radio
-                    inline
-                    checked={this.state.danger === 'medium'}
-                    onChange={() => this.setState({ danger: 'medium' })}
-                >
-                  Medium
-                </Radio>
-                <Radio
-                    inline
-                    checked={this.state.danger === 'high'}
-                    onChange={() => this.setState({ danger: 'high' })}
-                >
-                  High
-                </Radio>
-              </Panel>
-              <p>These options are placeholder and not final!</p>
-            </FormGroup>
-
-          </Modal.Body>
-
-          <Modal.Footer>
-            <Button onClick={this.close}>Cancel</Button>
-            <Button bsStyle="primary" onClick={this.addNode}>Submit</Button>
-          </Modal.Footer>
-
-        </Modal>
-
-        {!this.state.showModal && this.props.auth.isAnon ?
-        <OverlayTrigger placement="top" overlay={addNodeDisabledTip}>
-          <button
-              className="App-addNode-disabled"
-              disabled={!this.props.auth.isAnon}
-          >
-            <Glyphicon glyph="flag" />
-          </button>
-        </OverlayTrigger>
-        : null}
-        {!this.state.showModal && !this.props.auth.isAnon ?
-        <OverlayTrigger placement="top" overlay={addNodeTip}>
-          <button
-              className="App-addNode"
-              onClick={this.open}
-          >
-            <Glyphicon glyph="flag" />
-          </button>
-        </OverlayTrigger>
-        : null}
-        {!this.state.showModal ?
-        <OverlayTrigger placement="top" overlay={getLocationTip}>
-          <button
-              className="App-getLocation"
-              onClick={this.getLocation}
-          >
-            <Glyphicon glyph="glyphicon glyphicon-map-marker" />
-          </button>
-        </OverlayTrigger>
-        : null}
-        <Map
-            key={this.state.key}
-            location={this.state.location}
-            nodes={this.state.nodes}
-        />
-      </div>
-    );
+    console.log('container props', this.props.nodes.toJS());
+    console.log(this.init());
+    if (this.init()) {
+      console.log('yes');
+      return (
+        <div>
+          <Filters
+            filter={this.props.nodes.filter}
+            changeFilter={this.props.changeFilter}
+          />
+          <Controls
+            auth={this.props.auth}
+            showModal={this.props.showModal}
+          />
+          <Safe
+            show={this.props.nodes.showModal === 'safe'}
+            submit={this.props.addNode}
+            close={this.props.closeModal}
+            limit={this.props.nodes.limit}
+          />
+          <Danger
+            show={this.props.nodes.showModal === 'danger'}
+            submit={this.props.addNode}
+            close={this.props.closeModal}
+            limit={this.props.nodes.limit}
+          />
+          <Customize
+            show={this.props.nodes.showModal === 'customize'}
+            close={this.props.closeModal}
+            setStyle={this.props.setStyle}
+          />
+          <Contacts
+            show={this.props.nodes.showModal === 'contacts'}
+            close={this.props.closeModal}
+            contacts={this.props.auth.contacts}
+          />
+          <Directions
+            home={this.props.auth.home}
+            favorites={this.props.auth.favorites}
+            places={this.props.auth.places}
+            show={this.props.nodes.showModal === 'directions'}
+            close={this.props.closeModal}
+          />
+          <Location
+            show={this.props.nodes.showModal === 'location'}
+            close={this.props.closeModal}
+            address={this.props.nodes.address}
+            placeId={this.props.nodes.placeId}
+            danger={this.props.nodes.danger}
+            safe={this.props.nodes.safe}
+            rating={this.props.nodes.rating}
+            reports={this.props.nodes.reports}
+            getRating={this.props.getRating}
+          />
+          <Reports
+            filter={this.props.nodes.filter}
+            safe={this.props.nodes.totalSafe}
+            danger={this.props.nodes.totalDanger}
+            total={this.props.nodes.list.size}
+          />
+          <Map
+            loader={GoogleMapsLoader}
+            key={this.props.nodes.timestamp}
+            location={this.props.nodes.location.toJS()}
+            nodes={this.props.nodes.list.toJS()}
+            nodeFilter={this.props.nodes.filter}
+            style={this.props.nodes.style.toJS()}
+          />
+        </div>
+      );
+    }
+    console.log('no props');
+    return null;
   }
 }
 
 const mapStateToProps = createSelector(
   getAuth,
-  auth => ({ auth })
+  getNodes,
+  (auth, nodes) => ({
+    auth, nodes
+  })
+);
+
+const mapDispatchToProps = Object.assign(
+  {},
+  nodesActions,
 );
 
 export default connect(
   mapStateToProps,
-  authActions
+  mapDispatchToProps
 )(MapContainer);
