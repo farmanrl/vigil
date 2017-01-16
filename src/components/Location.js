@@ -10,42 +10,46 @@ class Location extends Component {
   static propTypes = {
     danger: PropTypes.number,
     safe: PropTypes.number,
-    rating: PropTypes.string,
-    reports: PropTypes.number,
     address: PropTypes.string,
-    placeId: PropTypes.string,
     show: PropTypes.bool,
     close: PropTypes.func,
-    getRating: PropTypes.func,
-  }
-
-  componentWillMount = () => {
-    this.props.getRating(this.props.placeId);
   }
 
   render() {
+    const reports = this.props.safe + this.props.danger;
+    const risk = this.props.danger / reports;
+    let rating = null;
+    if (risk <= 0.25) {
+      rating = 'Low';
+    } else if (risk <= 0.5) {
+      rating = 'Moderate';
+    } else if (risk <= 0.75) {
+      rating = 'High';
+    } else {
+      rating = 'Extreme';
+    }
     return (
       <Modal show={this.props.show} onHide={this.props.close}>
 
-        <Modal.Header closeButton>
+        <Modal.Header style={{ background: '#5bc0de', color: 'white' }} closeButton>
           <Modal.Title>{this.props.address}</Modal.Title>
         </Modal.Header>
 
-        {this.props.reports ?
+        {reports ?
          <Modal.Body>
-           <Modal.Title>{this.props.rating} risk</Modal.Title>
-           <br />
-           <ControlLabel>Reports <Badge>{this.props.reports}</Badge></ControlLabel>
+           <Modal.Title>{rating} risk</Modal.Title>
+           <hr />
+           <ControlLabel>{this.props.filter} - Reports <Badge>{reports}</Badge></ControlLabel>
            <ProgressBar>
              <ProgressBar
                now={this.props.safe}
-               max={this.props.reports}
+               max={reports}
                label="safe"
                key={1}
              />
              <ProgressBar
                now={this.props.danger}
-               max={this.props.reports}
+               max={reports}
                label="danger"
                bsStyle="danger"
                key={2}

@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { authActions, getAuth } from '../redux/auth';
+import { getUser } from '../redux/user';
 import Information from './Information';
 import Resources from './Resources';
 
@@ -13,8 +14,8 @@ class Home extends Component {
   render() {
     return (
       <div style={{backgroundColor: '#333'}}>
-        <Resources resources={this.props.auth.resources} />
-        <Information anon={this.props.auth.isAnon} />
+        <Resources resources={this.props.user.resources} />
+        <Information anon={this.props.auth.anon} />
       </div>
     );
   }
@@ -22,7 +23,8 @@ class Home extends Component {
 
 const mapStateToProps = createSelector(
   getAuth,
-  auth => ({ auth })
+  getUser,
+  (auth, user) => ({ auth, user })
 );
 
 export default connect(

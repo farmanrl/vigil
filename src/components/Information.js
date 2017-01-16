@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import firebase from 'firebase';
-import { Button, Accordion, Panel, FormGroup, ControlLabel, FormControl, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Button, Accordion, Panel, FormGroup, ControlLabel, FormControl, ListGroup, ListGroupItem, Well } from 'react-bootstrap';
 
 class Information extends Component {
   static propTypes = {
@@ -87,7 +87,9 @@ class Information extends Component {
           </p>
           <p>Any contribution you can make would be very much appreciated and go directly to supporting the application, allowing me to make our application bigger and better.</p>
           <a href="https://www.gofundme.com/vigil-app"><h4>GoFundMe Page</h4></a>
-          <strong>Goal: $12</strong>
+          <Well>
+            <strong>Goal: $12</strong>
+          </Well>
         </Panel>
         <Panel header="Feedback" eventKey="feedback">
           <p>I am always looking to improve our application and provide more features and enhanced functionality to my users.

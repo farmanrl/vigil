@@ -3,6 +3,9 @@ import {
   Accordion,
   Panel,
 } from 'react-bootstrap';
+import { addStyle } from 'react-bootstrap/lib/utils/bootstrapUtils';
+
+addStyle(Panel, 'dark');
 
 const reports = {
   position: 'absolute',

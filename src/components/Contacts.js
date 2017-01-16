@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import firebase from 'firebase';
 import {
   Panel,
   Modal,
@@ -15,52 +14,43 @@ import {
 
 class Contacts extends Component {
   static propTypes = {
-    contacts: PropTypes.object,
+    contacts: PropTypes.array,
     show: PropTypes.bool,
-    close: PropTypes.func,
+    close: PropTypes.func.isRequired,
+    submitUserContact: PropTypes.func.isRequired,
+    removeUserContact: PropTypes.func,
   }
 
   constructor(props){
     super(props);
     this.state = {
-      contactName: '',
-      contactNumber: '',
+      name: '',
+      number: '',
+      valid: null,
     };
   }
 
-  addContact = () => {
-    console.log('ay');
-    if (this.state.contactName && (this.state.contactNumber.match(/^[0-9]+$/) !== null && this.state.contactNumber.length) > 10) {
-      console.log('true');
-      const uid = firebase.auth().currentUser.uid;
-      const id = firebase.database().ref().child(`/users/${uid}/contacts`)
-                         .push().key;
-      const contact = {
-        name: this.state.contactName,
-        number: this.state.contactNumber
-      };
-      const updates = {};
-      updates[`users/${uid}/contacts/${id}`] = contact;
-      console.log('whoaaaa');
-      this.setState({
-        contactName: '',
-        contactNumber: '',
-      });
-      return firebase.database().ref().update(updates);
+  submitUserContact = (name, number) => {
+    if (this.state.number.match(/^[0-9]+$/) !== null &&
+        this.state.number.length > 10 &&
+        this.state.name) {
+          this.props.submitUserContact(name, number);
+          this.setState({ name: '', number: '', valid: null });
+    } else {
+      this.setState({ valid: false });
     }
   }
 
   removeContact = (contact) => {
-    const uid = firebase.auth().currentUser.uid;
-    firebase.database().ref(`users/${uid}/contacts/${contact}`).remove();
+    this.props.removeUserContact(contact);
   }
 
   handleName = (event) => {
-    this.setState({ contactName: event.target.value });
+    this.setState({ name: event.target.value });
   }
 
   handleNumber = (event) => {
-    this.setState({ contactNumber: event.target.value });
+    this.setState({ number: event.target.value });
   }
 
 
@@ -68,30 +58,30 @@ class Contacts extends Component {
     return (
       <Modal show={this.props.show} onHide={this.props.close}>
 
-        <Modal.Header style={{ background: '#5bc0de', color: 'white' }} closeButton>
+        <Modal.Header style={{ background: '#5cb85c', color: 'white' }} closeButton>
           <Modal.Title>Contacts</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
           <h5><strong>Contacts</strong></h5>
           {this.props.contacts ?
-           Object.keys(this.props.contacts).map((contact, index) => (
+           Object.keys(this.props.contacts).map((entry, index) => (
              <Panel key={index}>
                <Media.Left>
                  <Glyphicon style={{ fontSize: 24 }} glyph="glyphicon glyphicon-user" />
                </Media.Left>
                <Media.Body>
-                 <Media.Heading>{this.props.contacts[contact].name}</Media.Heading>
-                 <p>{this.props.contacts[contact].number}</p>
+                 <Media.Heading>{this.props.contacts[entry].contact.name}</Media.Heading>
+                 <p>{this.props.contacts[entry].contact.number}</p>
                </Media.Body>
                <Media.Right>
                  <ButtonGroup vertical>
-                   <a href="tel:{this.props.contacts[contact].number.toString()}">
+                   <a href={'tel:' + this.props.contacts[entry].contact.number}>
                      <Button style={{ width: '100%'}}>
                        Call
                      </Button>
                    </a>
-                   <Button bsStyle="link" onClick={() => this.removeContact(contact)}>
+                   <Button bsStyle="link" onClick={() => this.removeContact(this.props.contacts[entry])}>
                      Remove
                    </Button>
                  </ButtonGroup>
@@ -103,20 +93,41 @@ class Contacts extends Component {
              <ControlLabel>Add contact</ControlLabel>
              <FormGroup>
                <InputGroup>
-                 <FormControl placeholder="name of contact" onChange={this.handleName} type="text" />
-                 {(this.state.contactNumber.match(/^[0-9]+$/) !== null && this.state.contactNumber.length > 10) ?
+                 <FormControl
+                   placeholder="name of contact"
+                   onChange={this.handleName}
+                   type="text"
+                   value={this.state.name}
+                 />
+                 {(this.state.number.match(/^[0-9]+$/) !== null && this.state.number.length > 10) ?
                   <FormGroup validationState="success">
-                    <FormControl placeholder="ten digit number" onChange={this.handleNumber} type="text" validationState="warning"/>
+                    <FormControl
+                      placeholder="eleven digit number"
+                      onChange={this.handleNumber}
+                      type="text"
+                      validationState="warning"
+                      value={this.state.number}
+                    />
                   </FormGroup>
                   :
                   <FormGroup validationState="warning">
-                    <FormControl placeholder="ten digit number" onChange={this.handleNumber} type="text" validationState="success"/>
+                    <FormControl
+                      placeholder="eleven digit number"
+                      onChange={this.handleNumber}
+                      type="text"
+                      validationState="success"
+                      value={this.state.number}
+                    />
                   </FormGroup>
                  }
                   <InputGroup.Button>
                     <Button
                       style={{padding: 0, height: '100%', width: 32}}
-                      onClick={this.addContact}
+                      onClick={() =>
+                        this.submitUserContact(
+                          this.state.name,
+                          this.state.number
+                        )}
                     >
                       +
                     </Button>

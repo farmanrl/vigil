@@ -13,3 +13,10 @@ export {
   getCurrentTimestamp,
   getValid,
 } from './selectors';
+
+export function initNodes(dispatch) {
+  return new Promise((resolve, reject) => {
+    dispatch(nodesActions.loadNodes());
+    resolve();
+  });
+}

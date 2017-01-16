@@ -12,7 +12,7 @@ const controls = {
 
 class Controls extends Component {
   static propTypes = {
-    auth: PropTypes.object,
+    anon: PropTypes.bool,
     showModal: PropTypes.func,
   }
 
@@ -23,7 +23,7 @@ class Controls extends Component {
 
           <DropdownButton
             dropup id="split-button-dropup"
-            disabled={this.props.auth.isAnon}
+            disabled={this.props.anon}
             title=""
           >
             <MenuItem
@@ -57,14 +57,14 @@ class Controls extends Component {
           <Button
             bsStyle="primary"
             onClick={() => this.props.showModal('safe')}
-            disabled={this.props.auth.isAnon}
+            disabled={this.props.anon}
           >
             Safe
           </Button>
           <Button
             bsStyle="danger"
             onClick={() => this.props.showModal('danger')}
-            disabled={this.props.auth.isAnon}
+            disabled={this.props.anon}
           >
             Danger
           </Button>

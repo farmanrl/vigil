@@ -42,7 +42,7 @@ class Header extends Component {
               />
               <div>
                 <h2 className="Header-title">VIGIL</h2>
-                <h5 className="Header-subtitle"><Label>Beta</Label></h5>
+                <h5 className="Header-subtitle"><Label>1.0</Label></h5>
               </div>
             </Button>
             <div className="Header-controls">
@@ -79,7 +79,7 @@ class Header extends Component {
           </div>
           <Modal show={this.state.showModal} onHide={this.close}>
             <Modal.Header closeButton>
-              <Modal.Title>VIGIL - Beta Prototype</Modal.Title>
+              <Modal.Title>VIGIL - Prototype</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <h3>Created by Richard Farman</h3>

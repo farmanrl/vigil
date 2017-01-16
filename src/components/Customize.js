@@ -6,6 +6,8 @@ import {
   ControlLabel,
 } from 'react-bootstrap';
 
+const header = { background: '#f0ad4e', color: 'white' };
+
 class Customize extends Component {
   static propTypes = {
     show: PropTypes.bool,
@@ -21,7 +23,7 @@ class Customize extends Component {
     return (
       <Modal show={this.props.show} onHide={this.props.close}>
 
-        <Modal.Header closeButton>
+        <Modal.Header style={header} closeButton>
           <Modal.Title>
             Customize map
           </Modal.Title>

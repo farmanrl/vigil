@@ -9,6 +9,7 @@ const header = { background: '#337ab7', color: 'white' };
 
 class Safe extends Component {
   static propTypes = {
+    address: PropTypes.string,
     show: PropTypes.bool,
     limit: PropTypes.number,
     close: PropTypes.func,
@@ -19,10 +20,12 @@ class Safe extends Component {
       <Modal show={this.props.show} onHide={this.props.close}>
 
         <Modal.Header style={header} closeButton>
-          <Modal.Title>Mark Location as Safe</Modal.Title>
+          <Modal.Title>{this.props.address}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
+          <Modal.Title>Mark Location as Danger</Modal.Title>
+          <hr />
           <p>Your location will be logged anonymously in our database.</p>
           <p>Your report will be displayed to other users on the map.</p>
           <p>This action cannot be undone, so use at your discretion.</p>

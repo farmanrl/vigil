@@ -1,7 +1,6 @@
 import React, { PropTypes, Component } from 'react';
 import { ProgressBar, Badge, ControlLabel, Modal } from 'react-bootstrap';
 import './Map.css';
-import { dark, light, retro, night, silver, aubergine } from './MapStyles';
 
 const container = {
   position: 'absolute',
@@ -13,10 +12,12 @@ const container = {
 
 class Map extends Component {
   static propTypes = {
-    nodes: PropTypes.array,
+    nodeList: PropTypes.object,
     location: PropTypes.object,
     loader: PropTypes.object,
     style: PropTypes.array,
+    domain: PropTypes.string,
+    route: PropTypes.string,
   }
 
   constructor(props) {
@@ -31,7 +32,6 @@ class Map extends Component {
   }
 
   componentDidMount = () => {
-    console.log('map', this.props);
     this.props.loader.load((google) => {
       this.maps = google.maps;
       this.map = new google.maps.Map(document.getElementById('map'), {
@@ -46,28 +46,10 @@ class Map extends Component {
       if (this.props.route) {
         this.setRoute();
       }
-      if (this.props.nodes) {
+      if (this.props.nodeList) {
         this.setHeatmap();
       }
     });
-  }
-
-  getStyle = () => {
-    console.log(this.props.style);
-    if (this.props.style === 'dark') {
-      return dark;
-    } else if (this.props.style === 'light') {
-      return light;
-    } else if (this.props.style === 'retro') {
-      return retro;
-    } else if (this.props.style === 'night') {
-      return night;
-    } else if (this.props.style === 'silver') {
-      return silver;
-    } else if (this.props.style === 'aubergine') {
-      return aubergine;
-    }
-    return dark;
   }
 
   setMarker = () => {
@@ -78,16 +60,16 @@ class Map extends Component {
   }
 
   setHeatmap = () => {
-    const data = Object.keys(this.props.nodes).map(node => (
-      new this.maps.LatLng(
-        this.props.nodes[node].location.lat,
-        this.props.nodes[node].location.lng
-      )
+    const nodeList = this.props.nodeList;
+    const data = [];
+    nodeList.map(entry => (
+      data.push(new this.maps.LatLng(
+        entry.node.location,
+      ))
     ));
-    console.log(data);
     const options = {
       radius: 15,
-      maxIntensity: this.props.nodes.length / 10,
+      maxIntensity: this.props.nodeList.size / 10,
     };
     const heatmap = new this.maps.visualization.HeatmapLayer({
       data,
@@ -98,16 +80,19 @@ class Map extends Component {
   }
 
   setRoute = () => {
-    const route = this.props.route;
-    const destination = { lat: route.lat, lng: route.lng };
     const directionsService = new this.maps.DirectionsService();
-    const directionsDisplay = new this.maps.DirectionsRenderer();
+    const directionsDisplay =
+    new this.maps.DirectionsRenderer({
+      draggable: true,
+      map: this.map,
+    });
+    directionsDisplay.setMap(this.map);
+    directionsDisplay.setPanel(document.getElementById('directionDisplay'));
     const request = {
       origin: this.props.location,
-      destination,
+      destination: { placeId: this.props.route },
       travelMode: this.maps.TravelMode.WALKING
     };
-    directionsDisplay.setMap(this.map);
     directionsService.route(request, (response, status) => {
       if (status === 'OK') {
         directionsDisplay.setDirections(response);
@@ -116,26 +101,15 @@ class Map extends Component {
   }
 
   onClick = (event) => {
-    let danger = 0;
-    let safe = 0;
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
     const location = { lat, lng };
-    const geocoder = new this.maps.Geocoder;
+    const geocoder = new this.maps.Geocoder();
     geocoder.geocode({ location }, (results, status) => {
       if (status === 'OK') {
         const address = results[0].formatted_address;
-        this.props.nodes.forEach((node) => {
-          if (results[0].place_id === node.place) {
-            if (node.report) {
-              if (node.report === 'safe') {
-                safe += 1;
-              } else if (node.report === 'danger') {
-                danger += 1;
-              }
-            }
-          }
-        });
+        const safe = this.props.nodeList.filter(n => (n.node.report === 'safe' && results[0].place_id === n.node.placeId)).size;
+        const danger = this.props.nodeList.filter(n => (n.node.report === 'danger' && results[0].place_id === n.node.placeId)).size;
         const reports = safe + danger;
         if (reports) {
           const risk = danger / reports;
@@ -189,8 +163,8 @@ class Map extends Component {
           </Modal.Header>
           <Modal.Body>
             <Modal.Title>{this.state.rating} risk</Modal.Title>
-            <br />
-            <ControlLabel>Reports <Badge>{this.state.reports}</Badge></ControlLabel>
+            <hr />
+            <ControlLabel>{this.props.filter} - Reports <Badge>{this.state.reports}</Badge></ControlLabel>
             <ProgressBar>
               <ProgressBar
                 now={this.state.safe}
