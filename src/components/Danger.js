@@ -18,15 +18,14 @@ class Danger extends Component {
     return (
       <Modal show={this.props.show} onHide={this.props.close}>
 
-        <Modal.Header style={{background: '#d9534f', color: 'white'}} closeButton>
+        <Modal.Header style={{ background: '#d9534f', color: 'white' }} closeButton>
           <Modal.Title>{this.props.address}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
           <Modal.Title>Mark Location as Danger</Modal.Title>
           <hr />
-          <p>Your location will be logged anonymously in our database.</p>
-          <p>Your report will be displayed to other users on the map.</p>
+          <p>Your report will be  displayed anonymously to other users on the map.</p>
           <p>This action cannot be undone, so use at your discretion.</p>
           <p>If you wish to continue, submit and stay safe!</p>
         </Modal.Body>

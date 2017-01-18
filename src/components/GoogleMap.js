@@ -18,6 +18,9 @@ class Map extends Component {
     style: PropTypes.array,
     domain: PropTypes.string,
     route: PropTypes.string,
+    home: PropTypes.array,
+    favoriteList: PropTypes.array,
+    placeList: PropTypes.array,
   }
 
   constructor(props) {
@@ -28,6 +31,8 @@ class Map extends Component {
       safe: null,
       danger: null,
       address: null,
+      zoom: 16,
+      center: this.props.location,
     };
   }
 
@@ -35,13 +40,32 @@ class Map extends Component {
     this.props.loader.load((google) => {
       this.maps = google.maps;
       this.map = new google.maps.Map(document.getElementById('map'), {
-        center: this.props.location,
-        zoom: 16,
+        center: this.state.center ? this.state.center : this.props.location,
+        zoom: this.state.zoom,
         styles: this.props.style,
+        options: {
+          mapTypeControl: false,
+        }
+      });
+      this.map.addListener('zoom_changed', () => {
+        this.setState({ zoom: this.map.getZoom() });
+      });
+      this.map.addListener('drag', () => {
+        const center = this.map.getCenter();
+        this.setState({ center: { lat: center.lat(), lng: center.lng() } });
       });
       this.map.addListener('click', this.onClick);
       if (this.props.location) {
-        this.setMarker();
+        this.setLocationMarker();
+      }
+      if (this.props.home) {
+        this.setHomeMarker();
+      }
+      if (this.props.favoriteList) {
+        this.setFavoriteMarker();
+      }
+      if (this.props.placeList) {
+        this.setPlaceMarker();
       }
       if (this.props.route) {
         this.setRoute();
@@ -52,12 +76,59 @@ class Map extends Component {
     });
   }
 
-  setMarker = () => {
+  setLocationMarker = () => {
     new this.maps.Marker({
       position: this.props.location,
       map: this.map,
+      clickable: false,
     });
   }
+
+  setHomeMarker = () => {
+    this.props.home.map((entry) => (
+      new this.maps.Marker({
+        position: entry.direction.location,
+        icon: {
+          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Home-icon.svg/1024px-Home-icon.svg.png',
+          anchor: new this.maps.Point(15,30),
+          scaledSize: new this.maps.Size(30,30)
+        },
+        map: this.map,
+        clickable: false,
+      })
+    ));
+  }
+
+  setFavoriteMarker = () => {
+    this.props.favoriteList.map((entry, index) => (
+      new this.maps.Marker({
+        position: entry.direction.location,
+        icon: {
+          url: 'http://simpleicon.com/wp-content/uploads/star.png',
+          anchor: new this.maps.Point(15,30),
+          scaledSize: new this.maps.Size(30,30)
+        },
+        map: this.map,
+        clickable: false,
+      })
+    ));
+  }
+
+  setPlaceMarker = () => {
+    this.props.placeList.map((entry, index) => (
+      new this.maps.Marker({
+        position: entry.direction.location,
+        icon: {
+          url: 'https://d30y9cdsu7xlg0.cloudfront.net/png/1832-200.png',
+          anchor: new this.maps.Point(15,30),
+          scaledSize: new this.maps.Size(30,30)
+        },
+        map: this.map,
+        clickable: false,
+      })
+    ));
+  }
+
 
   setHeatmap = () => {
     const nodeList = this.props.nodeList;

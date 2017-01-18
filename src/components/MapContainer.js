@@ -127,6 +127,10 @@ class MapContainer extends Component {
            key={[this.props.nodes.timeFilter, this.props.user.style, this.props.user.route, this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter).size]}
            location={this.props.nodes.position.toJS()}
            nodeList={this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter)}
+           home={this.props.user.directionList.filter(d => d.type === 'home').toJS()}
+           favoriteList={this.props.user.directionList.filter(d => d.type === 'favorite').toJS()}
+           placeList={this.props.user.directionList.filter(d => d.type === 'place').toJS()}
+
            filter={this.props.nodes.nodeFilter}
            style={this.props.user.style.toJS()}
            route={this.props.user.route}

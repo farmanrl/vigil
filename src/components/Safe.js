@@ -24,10 +24,9 @@ class Safe extends Component {
         </Modal.Header>
 
         <Modal.Body>
-          <Modal.Title>Mark Location as Danger</Modal.Title>
+          <Modal.Title>Mark Location as Safe</Modal.Title>
           <hr />
-          <p>Your location will be logged anonymously in our database.</p>
-          <p>Your report will be displayed to other users on the map.</p>
+          <p>Your report will be displayed anonymously to other users on the heatmap.</p>
           <p>This action cannot be undone, so use at your discretion.</p>
           <p>If you wish to continue, submit and stay safe!</p>
         </Modal.Body>
