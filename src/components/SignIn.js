@@ -2,18 +2,25 @@ import React, { PropTypes } from 'react';
 import { Button, Label } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { authActions } from '../redux/auth';
+import logo from './vigil.png';
+
+const background = {
+  height: 'auto',
+  minHeight: '100%',
+  backgroundColor: '#333',
+  color: 'white'
+};
 
 export function SignIn({ signInWithGoogle, signInAnon }) {
   return (
-    <div style={{ height: 'auto', minHeight: '100%', backgroundColor: '#333', color: 'white'}}>
+    <div style={background}>
       <img
-        src={require("./vigil.png")}
+        src={logo}
         className="App-logo"
         alt="logo"
         style={{ height: 200, paddingTop: 12 }}
       />
-      <h1>VIGIL <h4><Label>1.0</Label></h4></h1>
-      <h5>By using this app, you agree to our <a href="https://media.termsfeed.com/pdf/eula-template.pdf">EULA</a></h5>
+      <h1>VIGIL</h1><h4><Label>1.1</Label></h4>
       <br />
       <Button bsSize="lg" onClick={signInWithGoogle}>
         Sign In

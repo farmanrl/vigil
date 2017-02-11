@@ -49,7 +49,7 @@ export const getRoutes = (getState) => {
         path: paths.SIGN_IN,
         component: SignIn,
         onEnter: requireUnauth(getState)
-      }
+      },
     ]
   };
 };
