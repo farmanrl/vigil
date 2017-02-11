@@ -1,201 +1,29 @@
 import React, { PropTypes, Component } from 'react';
-import GoogleMap from 'google-map-react';
-import { addStyle } from 'react-bootstrap/lib/utils/bootstrapUtils';
-import { Glyphicon, Popover, ProgressBar, Badge, ControlLabel, Modal } from 'react-bootstrap';
+import { ProgressBar, Badge, ControlLabel, Modal } from 'react-bootstrap';
 import './Map.css';
-import { dark, light, retro, night, silver, aubergine } from './MapStyles';
+import Charts from './Charts';
 
-addStyle(ProgressBar, 'med');
-addStyle(Popover, 'low');
-addStyle(Popover, 'moderate');
-addStyle(Popover, 'high');
-addStyle(Popover, 'extreme');
-
-const GoogleMapsLoader = require('google-maps');
-
-GoogleMapsLoader.KEY = 'AIzaSyBEL4h02l7rGkTO1tO_EduzXzB1FfKJ5Fk';
-GoogleMapsLoader.LIBRARIES = ['visualization', 'directions'];
-
-const styles = [
-  {
-    elementType: 'geometry',
-    stylers: [
-      {
-        color: '#212121'
-      }
-    ]
-  },
-  {
-    elementType: 'labels.icon',
-    stylers: [
-      {
-        visibility: 'off'
-      }
-    ]
-  },
-  {
-    elementType: 'labels.text.fill',
-    stylers: [
-      {
-        color: '#757575'
-      }
-    ]
-  },
-  {
-    elementType: 'labels.text.stroke',
-    stylers: [
-      {
-        color: '#212121'
-      }
-    ]
-  },
-  {
-    featureType: 'administrative',
-    elementType: 'geometry',
-    stylers: [
-      {
-        color: '#757575'
-      }
-    ]
-  },
-  {
-    featureType: 'administrative.country',
-    elementType: 'labels.text.fill',
-    stylers: [
-      {
-        color: '#9e9e9e'
-      }
-    ]
-  },
-  {
-    featureType: 'administrative.locality',
-    elementType: 'labels.text.fill',
-    stylers: [
-      {
-        color: '#bdbdbd'
-      }
-    ]
-  },
-  {
-    featureType: 'poi',
-    elementType: 'labels.text.fill',
-    stylers: [
-      {
-        color: '#757575'
-      }
-    ]
-  },
-  {
-    featureType: 'poi.park',
-    elementType: 'geometry',
-    stylers: [
-      {
-        color: '#181818'
-      }
-    ]
-  },
-  {
-    featureType: 'poi.park',
-    elementType: 'labels.text.fill',
-    stylers: [
-      {
-        color: '#616161'
-      }
-    ]
-  },
-  {
-    featureType: 'poi.park',
-    elementType: 'labels.text.stroke',
-    stylers: [
-      {
-        color: '#1b1b1b'
-      }
-    ]
-  },
-  {
-    featureType: 'road',
-    elementType: 'geometry.fill',
-    stylers: [
-      {
-        color: '#2c2c2c'
-      }
-    ]
-  },
-  {
-    featureType: 'road',
-    elementType: 'labels.text.fill',
-    stylers: [
-      {
-        color: '#8a8a8a'
-      }
-    ]
-  },
-  {
-    featureType: 'road.arterial',
-    elementType: 'geometry',
-    stylers: [
-      {
-        color: '#373737'
-      }
-    ]
-  },
-  {
-    featureType: 'road.highway',
-    elementType: 'geometry',
-    stylers: [
-      {
-        color: '#3c3c3c'
-      }
-    ]
-  },
-  {
-    featureType: 'road.highway.controlled_access',
-    elementType: 'geometry',
-    stylers: [
-      {
-        color: '#4e4e4e'
-      }
-    ]
-  },
-  {
-    featureType: 'road.local',
-    elementType: 'labels.text.fill',
-    stylers: [
-      {
-        color: '#616161'
-      }
-    ]
-  },
-  {
-    featureType: 'transit',
-    elementType: 'labels.text.fill',
-    stylers: [
-      {
-        color: '#757575'
-      }
-    ]
-  },
-  {
-    featureType: 'water',
-    elementType: 'geometry',
-    stylers: [
-      {
-        color: '#000000'
-      }
-    ]
-  },
-  {
-    featureType: 'water',
-    elementType: 'labels.text.fill',
-    stylers: [
-      {
-        color: '#3d3d3d'
-      }
-    ]
-  }
-];
+const container = {
+  position: 'absolute',
+  top: 120,
+  bottom: 0,
+  width: '100%',
+  color: 'white'
+};
 
 class Map extends Component {
+  static propTypes = {
+    nodeList: PropTypes.object,
+    location: PropTypes.object,
+    loader: PropTypes.object,
+    style: PropTypes.array,
+    route: PropTypes.object,
+    home: PropTypes.array,
+    favoriteList: PropTypes.array,
+    placeList: PropTypes.array,
+    filter: PropTypes.string,
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -203,195 +31,243 @@ class Map extends Component {
       rating: null,
       safe: null,
       danger: null,
-      zoom: 16
+      address: null,
+      zoom: 16,
     };
   }
 
-  onChange = ({ zoom }) => {
-    this.setState({ zoom });
+  componentDidMount = () => {
+    this.props.loader.load((google) => {
+      this.maps = google.maps;
+      this.map = new google.maps.Map(document.getElementById('map'), {
+        center: this.props.location ?
+                this.props.location.toJS()
+              :
+                { lat: 46.072080, lng: -118.328129 },
+        zoom: this.state.zoom,
+        styles: this.props.style,
+        options: {
+          mapTypeControl: false,
+        }
+      });
+      this.map.addListener('click', this.onClick);
+      if (this.props.location) {
+        this.setLocationMarker();
+      }
+      if (this.props.home) {
+        this.setHomeMarker();
+      }
+      if (this.props.favoriteList) {
+        this.setFavoriteMarker();
+      }
+      if (this.props.placeList) {
+        this.setPlaceMarker();
+      }
+      if (this.props.route) {
+        this.setRoute();
+      }
+      if (this.props.nodeList) {
+        this.setHeatmap();
+      }
+    });
   }
 
-  onClick = (obj) => {
-    let danger = 0;
-    let safe = 0;
-    this.props.nodes.forEach((node) => {
-      const radius = 0.0002;
-      if (node.lat > obj.lat - radius &&
-          node.lat < obj.lat + radius &&
-          node.lng > obj.lng - radius &&
-          node.lng < obj.lng + radius) {
-        if (node.report) {
-          if (node.report === 'safe') {
-            safe += 1;
-          } else if (node.report === 'danger') {
-            danger += 1;
+  onClick = (event) => {
+    const lat = event.latLng.lat();
+    const lng = event.latLng.lng();
+    const location = { lat, lng };
+    const geocoder = new this.maps.Geocoder();
+    geocoder.geocode({ location }, (results, status) => {
+      if (status === 'OK') {
+        const address = results[0].formatted_address;
+        const safe = this.props.nodeList.filter(n => (
+          n.node.report === 'safe' && results[0].place_id === n.node.placeId)
+        );
+        const danger = this.props.nodeList.filter(n => (
+          n.node.report === 'danger' && results[0].place_id === n.node.placeId)
+        );
+        const reports = safe.size + danger.size;
+        if (reports) {
+          const risk = danger.size / reports;
+          let rating = null;
+          if (risk <= 0.25) {
+            rating = 'Low';
+          } else if (risk <= 0.5) {
+            rating = 'Moderate';
+          } else if (risk <= 0.75) {
+            rating = 'High';
+          } else {
+            rating = 'Extreme';
           }
+          this.setState({
+            safe: safe.size,
+            safeList: safe,
+            danger: danger.size,
+            dangerList: danger,
+            reports,
+            rating,
+            address,
+          });
+        } else {
+          this.setState({
+            reports: null,
+            safe: null,
+            danger: null,
+            rating: null,
+            address: null,
+          });
         }
       }
     });
-    const reports = safe + danger;
-    console.log(reports);
-    if (reports) {
-      console.log('there are reports');
-      const risk = danger / reports;
-      console.log(risk);
-      let rating = null;
-      if (risk <= 0.25) {
-        rating = 'Low';
-      } else if (risk <= 0.5) {
-        rating = 'Moderate';
-      } else if (risk <= 0.75) {
-        rating = 'High';
-      } else {
-        rating = 'Extreme';
-      }
-      this.setState({
-        lat: obj.lat,
-        lng: obj.lng,
-        safe,
-        danger,
-        reports,
-        rating
-      });
-    } else {
-      this.setState({
-        lat: obj.lat,
-        lng: obj.lng,
-        reports: 0,
-      });
-    }
   }
 
-  createMapOptions = (maps) => {
-    return { styles };
-  };
+  setLocationMarker = () => {
+    new this.maps.Marker({
+      position: this.props.location ? this.props.location.toJS() : null,
+      map: this.map,
+      clickable: false,
+    });
+  }
+
+  setHomeMarker = () => {
+    this.props.home.map(entry => (
+      new this.maps.Marker({
+        position: entry.direction.location,
+        icon: {
+          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Home-icon.svg/1024px-Home-icon.svg.png',
+          anchor: new this.maps.Point(15, 30),
+          scaledSize: new this.maps.Size(30, 30)
+        },
+        map: this.map,
+        clickable: false,
+      })
+    ));
+  }
+
+  setFavoriteMarker = () => {
+    this.props.favoriteList.map(entry => (
+      new this.maps.Marker({
+        position: entry.direction.location,
+        icon: {
+          url: 'http://simpleicon.com/wp-content/uploads/star.png',
+          anchor: new this.maps.Point(15, 30),
+          scaledSize: new this.maps.Size(30, 30)
+        },
+        map: this.map,
+        clickable: false,
+      })
+    ));
+  }
+
+  setPlaceMarker = () => {
+    this.props.placeList.map(entry => (
+      new this.maps.Marker({
+        position: entry.direction.location,
+        icon: {
+          url: 'https://d30y9cdsu7xlg0.cloudfront.net/png/1832-200.png',
+          anchor: new this.maps.Point(15, 30),
+          scaledSize: new this.maps.Size(30, 30)
+        },
+        map: this.map,
+        clickable: false,
+      })
+    ));
+  }
+
+
+  setHeatmap = () => {
+    const nodeList = this.props.nodeList;
+    const data = [];
+    nodeList.map(entry => (
+      data.push(new this.maps.LatLng(
+        entry.node.location,
+      ))
+    ));
+    const options = {
+      radius: 15,
+      maxIntensity: this.props.nodeList.size / 10,
+    };
+    const heatmap = new this.maps.visualization.HeatmapLayer({
+      data,
+      map: this.map,
+      options
+    });
+    heatmap.setMap(this.map);
+  }
+
+  setRoute = () => {
+    const directionsService = new this.maps.DirectionsService();
+    const directionsDisplay =
+      new this.maps.DirectionsRenderer({
+        draggable: true,
+        map: this.map,
+      });
+    directionsDisplay.setMap(this.map);
+    directionsDisplay.setPanel(document.getElementById('directionDisplay'));
+    const request = {
+      origin: this.props.location ? this.props.location.toJS() : null,
+      destination: this.props.route,
+      travelMode: this.maps.TravelMode.WALKING
+    };
+    directionsService.route(request, (response, status) => {
+      if (status === 'OK') {
+        console.log(response);
+        directionsDisplay.setDirections(response);
+      }
+    });
+  }
+
+  close = () => {
+    this.setState({
+      reports: null,
+      safe: null,
+      danger: null,
+      rating: null,
+      address: null,
+    });
+  }
 
   render() {
-    if (this.props.style === 'dark') {
-      const style = dark;
-    } else if (this.props.style === 'light') {
-      const style = light;
-    } else if (this.props.style === 'retro') {
-      const style = retro;
-    } else if (this.props.style === 'night') {
-      const style = night;
-    } else if (this.props.style === 'silver') {
-      const style = silver;
-    } else if (this.props.style === 'aubergine') {
-      const style = aubergine;
-    }
-  } else {
-    const style = dark;
-  }
-    console.log('map props', this.props);
     return (
-      <div style={{ position: 'absolute', top: 120, bottom: 0, width: '100%', color: 'white' }}>
-      {this.props.nodes ?
-       <GoogleMap
-         options={this.createMapOptions}
-         center={this.props.location}
-         zoom={16}
-         onClick={this.onClick}
-         onChange={this.onChange}
-         yesIWantToUseGoogleMapApiInternals
-         onGoogleApiLoaded={({ map, maps }) => {
-             navigator.geolocation.getCurrentPosition((position) => {
-               console.log(position);
-               const location = { lat: position.coords.latitude, lng: position.coords.longitude};
-               if (this.props.goto) {
-                 const goto = this.props.goto;
-                 const destination = { lat: goto.lat, lng: goto.lng };
-                 const directionsService = new maps.DirectionsService();
-                 const directionsDisplay = new maps.DirectionsRenderer();
-                 const request = {
-                   origin: this.props.location,
-                   destination,
-                   travelMode: maps.TravelMode.WALKING
-                 };
-                 directionsDisplay.setMap(map);
-                 directionsService.route(request, (response, status) => {
-                   if (status === 'OK') {
-                     directionsDisplay.setDirections(response);
-                   }
-                 });
-               }
-               const marker = new maps.Marker({
-                 position: location,
-                 map
-               });
-               if (this.props.nodes) {
-                 const data = Object.keys(this.props.nodes).map(node => (
-                   new maps.LatLng(this.props.nodes[node].lat,
-                                   this.props.nodes[node].lng)
-                 ));
-                 const options = {
-                   radius: 15,
-                   maxIntensity: this.props.nodes.length / 10,
-                 };
-                 const heatmap = new maps.visualization.HeatmapLayer({
-                   data,
-                   options
-                 });
-                 heatmap.setMap(map);
-               }
-             });
-           }}
-       >
-         {this.state.reports ?
-          <div style={{
-              height: 120,
-              width: 240,
-              position: 'relative',
-              right: 120,
-              bottom: 185,
-              color: '#333'
-            }}
-            lat={this.state.lat}
-            lng={this.state.lng}
-             >
-               {this.state.rating === 'Low' ?
-                <Popover
-                  bsStyle="low"
-                  title={<h4 style={{ margin: 0 }}>{this.state.rating} risk</h4>}
-                  id="popover-basic"
-                  placement="top"
-                >
-                  <ControlLabel>Reports <Badge>{this.state.reports}</Badge></ControlLabel>
-                  <ProgressBar>
-                    <ProgressBar
-                      now={this.state.safe}
-                      max={this.state.reports}
-                      label="safe"
-                      key={1}
-                    />
-                    <ProgressBar
-                      now={this.state.danger}
-                      max={this.state.reports}
-                     label="danger"
-                     bsStyle="danger"
-                     key={2}
-                   />
-                 </ProgressBar>
-                 <div style={{ textAlign: 'center' }}>
-                   <p>This data is user generated and may not reflect real-world conditions</p>
-                 </div>
-                </Popover>
-                : null}
-          </div>
-             :
-          null }
-       </GoogleMap>
-       : null}
+      <div id="map" style={container}>
+        <div>
+          <Modal
+            show={Number.isInteger(this.state.reports)}
+            bsStyle="low"
+            onHide={this.close}
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>{this.state.address}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Modal.Title>{this.state.rating} risk</Modal.Title>
+              <hr />
+              <ControlLabel>
+                {this.props.filter} - Reports {' '}
+                <Badge>{this.state.reports}</Badge>
+              </ControlLabel>
+              <ProgressBar>
+                <ProgressBar
+                  now={this.state.safe}
+                  max={this.state.reports}
+                  label="safe"
+                  key={1}
+                />
+                <ProgressBar
+                  now={this.state.danger}
+                  max={this.state.reports}
+                  label="danger"
+                  bsStyle="danger"
+                  key={2}
+                />
+              </ProgressBar>
+              <Charts safe={this.state.dangerList} danger={this.state.safeList} />
+            </Modal.Body>
+          </Modal>
+        </div>
       </div>
     );
   }
 }
-
-Map.propTypes = {
-  showLocation: PropTypes.boolean,
-  goto: PropTypes.boolean,
-  location: PropTypes.object,
-  nodes: PropTypes.array,
-};
 
 export default Map;

@@ -4,14 +4,14 @@ import { createSelector } from 'reselect';
 import { getNodes, nodesActions } from '../redux/nodes';
 import { getAuth } from '../redux/auth';
 import { getUser, userActions } from '../redux/user';
-import { Button } from 'react-bootstrap';
+import { Button, ButtonGroup } from 'react-bootstrap';
 import Filters from './Filters';
-import Map from './GoogleMap';
+import Map from './Map';
 import Controls from './Controls';
 import Safe from './Safe';
 import Danger from './Danger';
 import Customize from './Customize';
-import Contacts from './Contacts';
+import ContactList from './ContactList';
 import DirectionList from './DirectionList';
 import Location from './Location';
 import Reports from './Reports';
@@ -24,7 +24,7 @@ const GoogleMapsLoader = require('google-maps');
 GoogleMapsLoader.KEY = 'AIzaSyD9bTn4_tEC1z_97fgdBGzlNe0GziAnIu4';
 GoogleMapsLoader.LIBRARIES = ['visualization'];
 
-const cancel = {
+const subcontrols = {
   position: 'fixed', bottom: 32, left: 12, zIndex: 1000
 };
 
@@ -32,20 +32,15 @@ class MapContainer extends Component {
   static propTypes = {
     auth: PropTypes.object,
     nodes: PropTypes.object,
-    loadNodes: PropTypes.func,
-    changeFilter: PropTypes.func,
-    update: PropTypes.func,
+    update: PropTypes.func.isRequired,
     addNode: PropTypes.func,
     showModal: PropTypes.func,
     closeModal: PropTypes.func,
-    getRating: PropTypes.func,
     submitUserDirection: PropTypes.func.isRequired,
     removeUserDirection: PropTypes.func.isRequired,
     submitUserContact: PropTypes.func.isRequired,
     removeUserContact: PropTypes.func.isRequired,
     setRoute: PropTypes.func,
-    getStyle: PropTypes.func,
-    setStyle: PropTypes.func,
   }
 
   componentWillMount() {
@@ -68,6 +63,8 @@ class MapContainer extends Component {
         <Controls
           anon={this.props.auth.anon}
           showModal={this.props.showModal}
+          position={this.props.nodes.position}
+          update={this.props.update}
         />
         <Safe
           show={this.props.nodes.showModal === 'safe'}
@@ -87,9 +84,8 @@ class MapContainer extends Component {
           show={this.props.nodes.showModal === 'customize'}
           close={this.props.closeModal}
           setStyle={this.props.submitUserStyle}
-          update={this.props.update}
         />
-        <Contacts
+        <ContactList
           show={this.props.nodes.showModal === 'contacts'}
           close={this.props.closeModal}
           contacts={this.props.user.contactList.toJS()}
@@ -110,8 +106,8 @@ class MapContainer extends Component {
           show={this.props.nodes.showModal === 'location'}
           close={this.props.closeModal}
           address={this.props.nodes.address}
-          danger={this.props.nodes.nodeList.filter(n => n.node.placeId === this.props.nodes.placeId).filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'danger').size}
-          safe={this.props.nodes.nodeList.filter(n => n.node.placeId === this.props.nodes.placeId).filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'safe').size}
+          danger={this.props.nodes.nodeList ? this.props.nodes.nodeList.filter(n => n.node.placeId === this.props.nodes.placeId).filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'danger') : null}
+          safe={this.props.nodes.nodeList ? this.props.nodes.nodeList.filter(n => n.node.placeId === this.props.nodes.placeId).filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'safe') : null}
           filter={this.props.nodes.nodeFilter}
         />
         <Reports
@@ -120,34 +116,45 @@ class MapContainer extends Component {
           danger={this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'danger').size}
           total={this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter).size}
         />
-        {this.props.nodes.position &&
-         this.props.user.style &&
+        {this.props.user.style &&
          <Map
            loader={GoogleMapsLoader}
-           key={[this.props.nodes.timeFilter, this.props.user.style, this.props.user.route, this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter).size]}
-           location={this.props.nodes.position.toJS()}
+           key={[this.props.nodes.timeFilter, this.props.user.style, this.props.user.route, this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter).size, this.props.user.directionList, this.props.nodes.position]}
+           location={this.props.nodes.position}
            nodeList={this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter)}
            home={this.props.user.directionList.filter(d => d.type === 'home').toJS()}
            favoriteList={this.props.user.directionList.filter(d => d.type === 'favorite').toJS()}
            placeList={this.props.user.directionList.filter(d => d.type === 'place').toJS()}
 
            filter={this.props.nodes.nodeFilter}
-           style={this.props.user.style.toJS()}
-           route={this.props.user.route}
+           style={this.props.user.style ? this.props.user.style.toJS() : null}
+           route={this.props.user.route ? this.props.user.route.toJS() : null}
          />
         }
-         {this.props.user.route &&
-          <div
-            style={cancel}
-          >
-            <Button
-              onClick={() => this.props.setRoute(null)}
-              disabled={this.props.auth.anon}
-            >
-              Cancel Route
-            </Button>
-          </div>
-         }
+        <div style={subcontrols}>
+          {this.props.user.route ?
+           <ButtonGroup>
+             <Button
+               href={`https://www.google.com/maps/dir/Current+Location/${this.props.user.route.get('lat')}, ${this.props.user.route.get('lng')}`}
+               bsStyle="success"
+             >
+               GPS
+             </Button>
+             <Button
+               onClick={() => this.props.setRoute(null)}
+             >
+               Cancel
+             </Button>
+           </ButtonGroup>
+           :
+           <Button
+             href="https://www.google.com/maps/dir/Current+Location/"
+             bsStyle="success"
+           >
+             GPS
+           </Button>
+          }
+        </div>
       </div>
     );
   }
