@@ -1,5 +1,15 @@
 import { database, auth } from '../firebase';
-import { dark, light, retro, night, silver, aubergine } from '../../components/MapStyles';
+import {
+  dark,
+  light,
+  retro,
+  desert,
+  golddust,
+  hopper,
+  avocado,
+  spooky,
+  colorblind,
+} from '../../components/MapStyles';
 
 const GoogleMapsLoader = require('google-maps');
 
@@ -66,10 +76,10 @@ export function deleteUserContact(contact) {
   };
 }
 
-export function setRoute(placeId) {
+export function setRoute(location) {
   return {
     type: 'SET_ROUTE',
-    payload: placeId
+    payload: location
   };
 }
 
@@ -249,12 +259,18 @@ export function loadUser(user) {
                dispatch(loadUserStyle(light));
              } else if (style === 'retro') {
                dispatch(loadUserStyle(retro));
-             } else if (style === 'night') {
-               dispatch(loadUserStyle(night));
-             } else if (style === 'silver') {
-               dispatch(loadUserStyle(silver));
-             } else if (style === 'aubergine') {
-               dispatch(loadUserStyle(aubergine));
+             } else if (style === 'desert') {
+               dispatch(loadUserStyle(desert));
+             } else if (style === 'golddust') {
+               dispatch(loadUserStyle(golddust));
+             } else if (style === 'avocado') {
+               dispatch(loadUserStyle(avocado));
+             } else if (style === 'hopper') {
+               dispatch(loadUserStyle(hopper));
+             } else if (style === 'spooky') {
+               dispatch(loadUserStyle(spooky));
+             } else if (style === 'colorblind') {
+               dispatch(loadUserStyle(colorblind));
              } else {
                dispatch(loadUserStyle(dark));
              }
@@ -270,7 +286,6 @@ export function loadUser(user) {
   }
   return null;
 }
-
 
 export function handleUser(email) {
   let domain = email.replace(/.*@/, '');

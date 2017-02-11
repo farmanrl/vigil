@@ -158,7 +158,7 @@ export function addNode(report) {
                 const updates = {};
                 let hasNode = false;
                 if (userNodes) {
-                  userNodes.map((entry, index) => {
+                  userNodes.map((entry) => {
                     if (entry.key === placeId) {
                       const id = entry.node;
                       updates[`/nodes/${domain}/${id}`] = node;
