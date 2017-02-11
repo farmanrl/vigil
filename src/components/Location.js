@@ -5,19 +5,21 @@ import {
   ProgressBar,
   Badge,
 } from 'react-bootstrap';
+import Charts from './Charts';
+
 
 class Location extends Component {
   static propTypes = {
-    danger: PropTypes.number,
-    safe: PropTypes.number,
+    danger: PropTypes.object,
+    safe: PropTypes.object,
     address: PropTypes.string,
     show: PropTypes.bool,
     close: PropTypes.func,
   }
 
   render() {
-    const reports = this.props.safe + this.props.danger;
-    const risk = this.props.danger / reports;
+    const reports = this.props.safe.size + this.props.danger.size;
+    const risk = this.props.danger.size / reports;
     let rating = null;
     if (risk <= 0.25) {
       rating = 'Low';
@@ -39,22 +41,26 @@ class Location extends Component {
          <Modal.Body>
            <Modal.Title>{rating} risk</Modal.Title>
            <hr />
-           <ControlLabel>{this.props.filter} - Reports <Badge>{reports}</Badge></ControlLabel>
+           <ControlLabel>
+             {this.props.filter} - Reports {' '}
+             <Badge>{reports}</Badge>
+           </ControlLabel>
            <ProgressBar>
              <ProgressBar
-               now={this.props.safe}
+               now={this.props.safe.size}
                max={reports}
                label="safe"
                key={1}
              />
              <ProgressBar
-               now={this.props.danger}
+               now={this.props.danger.size}
                max={reports}
                label="danger"
                bsStyle="danger"
                key={2}
              />
            </ProgressBar>
+           <Charts safe={this.props.safe} danger={this.props.danger} />
          </Modal.Body>
          :
          <Modal.Body>
