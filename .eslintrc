@@ -11,7 +11,7 @@
     "new-parens": 2,
     "space-infix-ops": 2,
     "no-trailing-spaces": 2,
-    "max-len": ["error", {"ignoreUrls": true, "code": 90}],
+    "max-len": ["error", {"ignoreUrls": true, "code": 80}],
     "no-template-curly-in-string": "off",
     "react/prefer-stateless-function": "off",
     "react/jsx-filename-extension": "off",
@@ -43,4 +43,8 @@
     "jsx-a11y",
     "import"
   ],
+    "globals": {
+    "google": false,
+  }
+
 }

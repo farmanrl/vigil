@@ -4,7 +4,7 @@ import { browserHistory } from 'react-router';
 import './index.css';
 import Root from './components/Root';
 import configureStore from './redux/store';
-import { initAuth } from './redux/auth';
+import { initApp } from './redux';
 
 const store = configureStore();
 const rootElement = document.getElementById('root');
@@ -22,6 +22,6 @@ if (module.hot) {
   });
 }
 
-initAuth(store.dispatch)
+initApp(store.dispatch)
   .then(() => render(Root))
   .catch(error => console.error(error)); // eslint-disable-line no-console

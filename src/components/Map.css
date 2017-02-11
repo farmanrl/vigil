@@ -1,0 +1,27 @@
+.progress-bar-med {
+    background-color: #E5804F;
+}
+
+.popover-title-low {
+    background-color: #337ab7;
+}
+
+.popover-title-moderate {
+    background-color: #f0ad4e;
+}
+
+.popover-title-high {
+    background-color: #E5804F;
+}
+
+.popover-title-extreme {
+    background-color: #d9534f;
+}
+
+.googlemap-container {
+    position: absolute;
+    top: 120px;
+    bottom: 0px;
+    width: 100%;
+    color: white;
+}

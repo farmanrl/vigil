@@ -7,7 +7,7 @@ import Home from './Home';
 export const paths = {
   ROOT: '/',
   SIGN_IN: '/sign-in',
-  MAP: '/map',
+  MAP: '/heatmap',
   HOME: '/home',
 };
 
@@ -49,7 +49,7 @@ export const getRoutes = (getState) => {
         path: paths.SIGN_IN,
         component: SignIn,
         onEnter: requireUnauth(getState)
-      }
+      },
     ]
   };
 };

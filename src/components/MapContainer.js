@@ -1,182 +1,160 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { authActions, getAuth } from '../redux/auth';
-import { Nav, NavItem, Modal, Button, Glyphicon, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import firebase from 'firebase';
+import { getNodes, nodesActions } from '../redux/nodes';
+import { getAuth } from '../redux/auth';
+import { getUser, userActions } from '../redux/user';
+import { Button, ButtonGroup } from 'react-bootstrap';
+import Filters from './Filters';
 import Map from './Map';
+import Controls from './Controls';
+import Safe from './Safe';
+import Danger from './Danger';
+import Customize from './Customize';
+import ContactList from './ContactList';
+import DirectionList from './DirectionList';
+import Location from './Location';
+import Reports from './Reports';
+
 import './App.css';
 import './MapContainer.css';
 
+const GoogleMapsLoader = require('google-maps');
+
+GoogleMapsLoader.KEY = 'AIzaSyD9bTn4_tEC1z_97fgdBGzlNe0GziAnIu4';
+GoogleMapsLoader.LIBRARIES = ['visualization'];
+
+const subcontrols = {
+  position: 'fixed', bottom: 32, left: 12, zIndex: 1000
+};
+
 class MapContainer extends Component {
   static propTypes = {
-    auth: PropTypes.object.isRequired,
+    auth: PropTypes.object,
+    nodes: PropTypes.object,
+    update: PropTypes.func.isRequired,
+    addNode: PropTypes.func,
+    showModal: PropTypes.func,
+    closeModal: PropTypes.func,
+    submitUserDirection: PropTypes.func.isRequired,
+    removeUserDirection: PropTypes.func.isRequired,
+    submitUserContact: PropTypes.func.isRequired,
+    removeUserContact: PropTypes.func.isRequired,
+    setRoute: PropTypes.func,
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      nodes: null,
-      filter: 'all',
-      start: 0,
-      showModal: false,
-      location: null,
-      key: null
-    };
+  componentWillMount() {
+    this.props.update();
   }
 
-  componentDidMount() {
-    this.getNodes();
-    navigator.geolocation.getCurrentPosition((position) => {
-      const coords = {
-        lat: position.coords.latitude, lng: position.coords.longitude
-      };
-      this.setState({ location: coords });
-    });
-  }
-
-  getNodes = () => {
-    firebase.database().ref('nodes/')
-            .once('value', (snapshot) => {
-              const nodes = [];
-              snapshot.forEach((data) => {
-                if (data.val().timestamp > this.state.start) {
-                  nodes.push(data.val());
-                }
-              });
-              this.setState({ nodes, key: Date.now() });
-            });
-  }
-
-  addNode = () => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const id = firebase.database().ref().child('/nodes').push().key;
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-      const timestamp = firebase.database.ServerValue.TIMESTAMP;
-      const node = { lat, lng, timestamp };
-      const updates = {};
-      updates[`/nodes/${id}`] = node;
-      firebase.database().ref().update(updates)
-              .then(() => this.getNodes());
-    });
-    this.close();
-  }
-
-  close = () => {
-    this.setState({ showModal: false });
-  }
-
-  open = () => {
-    this.setState({ showModal: true });
-  }
-
-  handleSelect = (key) => {
-    const time = Date.now();
-    switch (key) {
-      case 'day': {
-        const day = 86400000;
-        this.setState({ filter: key, start: time - day }, this.getNodes());
-        break;
-      }
-      case 'week': {
-        const week = 604800000;
-        this.setState({ filter: key, start: time - week }, this.getNodes());
-        break;
-      }
-      case 'month': {
-        const month = 2629746000;
-        this.setState({ filter: key, start: time - month }, this.getNodes());
-        break;
-      }
-      case 'year': {
-        const year = 31536000000;
-        this.setState({ filter: key, start: time - year }, this.getNodes());
-        break;
-      }
-      case 'all':
-        this.setState({ filter: key, start: 0 }, this.getNodes());
-        break;
-      default:
-        this.setState({ filter: null, start: 0 }, this.getNodes());
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.nodes.filter !== this.props.nodes.filter) {
+      this.props.update();
     }
   }
 
   render() {
-    const addNodeDisabledTip = (
-      <Tooltip id="tooltip">You must login to report location</Tooltip>
-    );
-    const addNodeTip = (
-      <Tooltip id="tooltip">Report your location</Tooltip>
-    );
     return (
       <div>
-        <Nav
-            bsStyle="pills"
-            justified
-            onSelect={this.handleSelect}
-            activeKey={this.state.filter}
-        >
-          <NavItem eventKey="day">
-            Day
-          </NavItem>
-          <NavItem eventKey="week">
-            Week
-          </NavItem>
-          <NavItem eventKey="month">
-            Month
-          </NavItem>
-          <NavItem eventKey="year">
-            Year
-          </NavItem>
-          <NavItem eventKey="all">
-            All
-          </NavItem>
-        </Nav>
-        <Modal show={this.state.showModal} onHide={this.close}>
-          <Modal.Header closeButton>
-            <Modal.Title>Submit Location</Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body>
-            <p>Your location will be logged anonymously in our database as a dangerous spot.</p>
-            <p>A marker will be displayed to other users as a warning.</p>
-            <p>This action cannot be undone, so report at your discretion.</p>
-            <p>If you wish to continue, submit your location, and stay safe!</p>
-          </Modal.Body>
-
-          <Modal.Footer>
-            <Button onClick={this.close}>Cancel</Button>
-            <Button bsStyle="primary" onClick={this.addNode}>Submit</Button>
-          </Modal.Footer>
-
-        </Modal>
-
-        {!this.state.showModal && this.props.auth.isAnon &&
-        <OverlayTrigger placement="top" overlay={addNodeDisabledTip}>
-          <button
-              className="App-addNode-disabled"
-              disabled={!this.props.auth.isAnon}
-          >
-            <Glyphicon glyph="flag" />
-          </button>
-        </OverlayTrigger>
-        }
-        {!this.state.showModal && !this.props.auth.isAnon &&
-        <OverlayTrigger placement="top" overlay={addNodeTip}>
-          <button
-              className="App-addNode"
-              onClick={this.open}
-          >
-            <Glyphicon glyph="flag" />
-          </button>
-        </OverlayTrigger>
-        }
-        <Map
-            key={this.state.key}
-            location={this.state.location}
-            nodes={this.state.nodes}
+        <Filters
+          filter={this.props.nodes.nodeFilter}
+          changeFilter={this.props.changeNodeFilter}
         />
+        <Controls
+          anon={this.props.auth.anon}
+          showModal={this.props.showModal}
+          position={this.props.nodes.position}
+          update={this.props.update}
+        />
+        <Safe
+          show={this.props.nodes.showModal === 'safe'}
+          submit={this.props.addNode}
+          close={this.props.closeModal}
+          limit={this.props.nodes.timelimit}
+          address={this.props.nodes.address}
+        />
+        <Danger
+          show={this.props.nodes.showModal === 'danger'}
+          submit={this.props.addNode}
+          close={this.props.closeModal}
+          limit={this.props.nodes.timelimit}
+          address={this.props.nodes.address}
+        />
+        <Customize
+          show={this.props.nodes.showModal === 'customize'}
+          close={this.props.closeModal}
+          setStyle={this.props.submitUserStyle}
+        />
+        <ContactList
+          show={this.props.nodes.showModal === 'contacts'}
+          close={this.props.closeModal}
+          contacts={this.props.user.contactList.toJS()}
+          submitUserContact={this.props.submitUserContact}
+          removeUserContact={this.props.removeUserContact}
+        />
+        <DirectionList
+          home={this.props.user.directionList.filter(d => d.type === 'home').toJS()}
+          favoriteList={this.props.user.directionList.filter(d => d.type === 'favorite').toJS()}
+          placeList={this.props.user.directionList.filter(d => d.type === 'place').toJS()}
+          show={this.props.nodes.showModal === 'directions'}
+          close={this.props.closeModal}
+          submitUserDirection={this.props.submitUserDirection}
+          removeUserDirection={this.props.removeUserDirection}
+          setRoute={this.props.setRoute}
+        />
+        <Location
+          show={this.props.nodes.showModal === 'location'}
+          close={this.props.closeModal}
+          address={this.props.nodes.address}
+          danger={this.props.nodes.nodeList ? this.props.nodes.nodeList.filter(n => n.node.placeId === this.props.nodes.placeId).filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'danger') : null}
+          safe={this.props.nodes.nodeList ? this.props.nodes.nodeList.filter(n => n.node.placeId === this.props.nodes.placeId).filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'safe') : null}
+          filter={this.props.nodes.nodeFilter}
+        />
+        <Reports
+          filter={this.props.nodes.nodeFilter}
+          safe={this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'safe').size}
+          danger={this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'danger').size}
+          total={this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter).size}
+        />
+        {this.props.user.style &&
+         <Map
+           loader={GoogleMapsLoader}
+           key={[this.props.nodes.timeFilter, this.props.user.style, this.props.user.route, this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter).size, this.props.user.directionList, this.props.nodes.position]}
+           location={this.props.nodes.position}
+           nodeList={this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter)}
+           home={this.props.user.directionList.filter(d => d.type === 'home').toJS()}
+           favoriteList={this.props.user.directionList.filter(d => d.type === 'favorite').toJS()}
+           placeList={this.props.user.directionList.filter(d => d.type === 'place').toJS()}
+
+           filter={this.props.nodes.nodeFilter}
+           style={this.props.user.style ? this.props.user.style.toJS() : null}
+           route={this.props.user.route ? this.props.user.route.toJS() : null}
+         />
+        }
+        <div style={subcontrols}>
+          {this.props.user.route ?
+           <ButtonGroup>
+             <Button
+               href={`https://www.google.com/maps/dir/Current+Location/${this.props.user.route.get('lat')}, ${this.props.user.route.get('lng')}`}
+               bsStyle="success"
+             >
+               GPS
+             </Button>
+             <Button
+               onClick={() => this.props.setRoute(null)}
+             >
+               Cancel
+             </Button>
+           </ButtonGroup>
+           :
+           <Button
+             href="https://www.google.com/maps/dir/Current+Location/"
+             bsStyle="success"
+           >
+             GPS
+           </Button>
+          }
+        </div>
       </div>
     );
   }
@@ -184,10 +162,20 @@ class MapContainer extends Component {
 
 const mapStateToProps = createSelector(
   getAuth,
-  auth => ({ auth })
+  getNodes,
+  getUser,
+  (auth, nodes, user) => ({
+    auth, nodes, user
+  })
+);
+
+const mapDispatchToProps = Object.assign(
+  {},
+  nodesActions,
+  userActions,
 );
 
 export default connect(
   mapStateToProps,
-  authActions
+  mapDispatchToProps
 )(MapContainer);

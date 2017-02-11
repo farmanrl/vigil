@@ -1,3 +1,9 @@
+.panel-dark {
+    background-color: #333;
+    color: white;
+    zIndex: 1000;
+}
+
 @media (max-width: 768px){
     .nav-justified > li {
         display: table-cell;
