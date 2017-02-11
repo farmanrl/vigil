@@ -38,12 +38,15 @@ class Customize extends Component {
               onChange={this.setStyle}
             >
               <option selected disabled>select...</option>
-              <option value="dark">dark</option>
+              <option value="dark">dark (default)</option>
               <option value="light">light</option>
               <option value="retro">retro</option>
-              <option value="night">night</option>
-              <option value="silver">silver</option>
-              <option value="aubergine">aubergine</option>
+              <option value="desert">desert</option>
+              <option value="hopper">hopper</option>
+              <option value="avocado">avocado</option>
+              <option value="golddust">gold dust</option>
+              <option value="spooky">spooky</option>
+              <option value="colorblind">colorblind</option>
             </FormControl>
           </FormGroup>
         </Modal.Body>

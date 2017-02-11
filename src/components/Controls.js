@@ -14,6 +14,7 @@ class Controls extends Component {
   static propTypes = {
     anon: PropTypes.bool,
     showModal: PropTypes.func,
+    update: PropTypes.func,
   }
 
   render() {
@@ -47,24 +48,32 @@ class Controls extends Component {
             </MenuItem>
             <MenuItem divider />
             <MenuItem
-              eventKey="3"
+              eventKey="4"
               onClick={() => this.props.showModal('customize')}
             >
               Customize map...
+            </MenuItem>
+            <MenuItem divider />
+            <MenuItem
+              eventKey="5"
+              disabled={!this.props.position}
+              onClick={() => this.props.update()}
+            >
+              Update Time/Location
             </MenuItem>
           </DropdownButton>
 
           <Button
             bsStyle="primary"
             onClick={() => this.props.showModal('safe')}
-            disabled={this.props.anon}
+            disabled={this.props.anon || !this.props.position}
           >
             Safe
           </Button>
           <Button
             bsStyle="danger"
             onClick={() => this.props.showModal('danger')}
-            disabled={this.props.anon}
+            disabled={this.props.anon || !this.props.position}
           >
             Danger
           </Button>
