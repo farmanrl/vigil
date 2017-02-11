@@ -4,7 +4,7 @@ import { createSelector } from 'reselect';
 import { authActions, getAuth } from '../redux/auth';
 import { getUser } from '../redux/user';
 import Information from './Information';
-import Resources from './Resources';
+import Domain from './Domain';
 
 class Home extends Component {
   static propTypes = {
@@ -14,7 +14,7 @@ class Home extends Component {
   render() {
     return (
       <div style={{backgroundColor: '#333'}}>
-        <Resources resources={this.props.user.resources} />
+        <Domain resources={this.props.user.resources} />
         <Information anon={this.props.auth.anon} />
       </div>
     );

@@ -53,10 +53,10 @@ class DirectionList extends Component {
           {this.props.home.length === 1 ?
            this.props.home.map((entry, index) => (
            <Panel key={entry.key}>
-             <Media.Left onClick={() => this.props.setRoute(entry.direction.place)}>
+             <Media.Left onClick={() => this.props.setRoute(entry.direction.location)}>
                <Glyphicon style={{ fontSize: 24 }} glyph="glyphicon glyphicon-home" />
              </Media.Left>
-             <Media.Body onClick={() => this.props.setRoute(entry.direction.place)}>
+             <Media.Body onClick={() => this.props.setRoute(entry.direction.location)}>
                <Media.Heading>{entry.direction.name}</Media.Heading>
                <p>{entry.direction.address}</p>
              </Media.Body>
@@ -72,10 +72,10 @@ class DirectionList extends Component {
            {this.props.favoriteList ?
             this.props.favoriteList.map((entry, index) => (
               <Panel key={index} >
-                <Media.Left onClick={() => this.props.setRoute(entry.direction.place)}>
+                <Media.Left onClick={() => this.props.setRoute(entry.direction.location)}>
                   <Glyphicon style={{ fontSize: 24 }} glyph="glyphicon glyphicon-star" />
                 </Media.Left>
-                <Media.Body onClick={() => this.props.setRoute(entry.direction.place)}>
+                <Media.Body onClick={() => this.props.setRoute(entry.direction.location)}>
                   <Media.Heading>{entry.direction.name}</Media.Heading>
                   <p>{entry.direction.address}</p>
                 </Media.Body>
@@ -91,10 +91,10 @@ class DirectionList extends Component {
               {this.props.placeList ?
                this.props.placeList.map((entry, index) => (
                  <Panel key={index}>
-                   <Media.Left onClick={() => this.props.setRoute(entry.direction.place)} >
+                   <Media.Left onClick={() => this.props.setRoute(entry.direction.location)} >
                      <Glyphicon style={{ fontSize: 24 }} glyph="glyphicon glyphicon-map-marker" />
                    </Media.Left>
-                   <Media.Body onClick={() => this.props.setRoute(entry.direction.place)}>
+                   <Media.Body onClick={() => this.props.setRoute(entry.direction.location)}>
                      <Media.Heading>{entry.direction.name}</Media.Heading>
                      <p>{entry.direction.address}</p>
                    </Media.Body>

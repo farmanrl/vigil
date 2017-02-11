@@ -1,58 +1,26 @@
-import React, { Component, PropTypes } from 'react';
-import { Panel, ListGroup, ListGroupItem, Label } from 'react-bootstrap';
+import React, { Component } from 'react';
+import { ListGroup, ListGroupItem } from 'react-bootstrap';
 
 class Resources extends Component {
-  static propTypes = {
-    resources: PropTypes.object,
-  }
-
   render() {
-    if (this.props.resources) {
-      return (
-        <div>
-          {this.props.resources.get('valid') &&
-          <Panel>
-            <img
-                src={this.props.resources.get('image')}
-                role="presentation"
-                style={{ height: 120 }}
-            />
-            <h1>{this.props.resources.get('name')}</h1>
-            <h3 style={{marginTop: 0}}>Security</h3>
-            <h3 style={{marginTop: 0}}>{this.props.resources.get('security')}</h3>
-            <ListGroup>
-              <ListGroupItem header="Information" href={this.props.resources.get('info')}>
-                View the services that campus security provides
-              </ListGroupItem>
-              <ListGroupItem header="Find Support" href={this.props.resources.get('support')}>
-                Find help and report offenses
-              </ListGroupItem>
-              <ListGroupItem header="Get Involved" href={this.props.resources.get('involved')}>
-                Learn how you can support the cause
-              </ListGroupItem>
-            </ListGroup>
-          </Panel>
-          }
-          {!this.props.resources.get('valid') &&
-          <Panel>
-            <h3>No resources available</h3>
-            <p>Resources are provided based on email domain name.</p>
-            <p>We will add support for your domain as soon as possible!</p>
-            <p><Label>.edu</Label> domains will be given priority.</p>
-          </Panel>
-          }
-        </div>
-      );
-    }
     return (
-      <div>
-        <Panel>
-          <h3>Sign in for more resources</h3>
-          <p>Resources are provided based on email domain name.</p>
-          <p>We will provide support for as many users as we can.</p>
-          <p><Label>.edu</Label> domains will be given priority.</p>
-        </Panel>
-      </div>
+      <ListGroup>
+        <ListGroupItem href="http://www.cdc.gov/violenceprevention/sexualviolence/prevention.html" header="Sexual Violence Prevention">
+          Everything you need to know about how to prevent sexual violence
+        </ListGroupItem>
+        <ListGroupItem href="https://www.rainn.org/about-national-sexual-assault-telephone-hotline" header="Sexual Violence Hotline">
+          Get immediate support through RAINN's national telephone hotline
+        </ListGroupItem>
+        <ListGroupItem href="https://www.rainn.org/articles/what-is-consent" header="About Consent">
+          Learn what it means to give and recieve consent
+        </ListGroupItem>
+        <ListGroupItem href="http://hams.cc/students/" header="Harm Reduction">
+          Learn techniques for minimizing health risks for yourself and others
+        </ListGroupItem>
+        <ListGroupItem href="https://www.livethegreendot.com/" header="Live the Green Dot">
+          Join the movement that inspired this application
+        </ListGroupItem>
+      </ListGroup>
     );
   }
 }
