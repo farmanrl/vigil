@@ -33,7 +33,7 @@ export function signInWithGoogle() {
   return (dispatch) => {
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.addScope('email');
-    auth.signInWithPopup(provider)
+    auth.signInWithRedirect(provider)
         .then((result) => {
           dispatch(signInSuccess(result));
         })
@@ -48,7 +48,6 @@ export function signInAnon() {
             .catch(error => dispatch(signInError(error)));
   };
 }
-
 
 export function signOut() {
   const uid = auth.currentUser.uid;
