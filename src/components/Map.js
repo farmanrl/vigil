@@ -3,6 +3,41 @@ import { ProgressBar, Badge, ControlLabel, Modal } from 'react-bootstrap';
 import './Map.css';
 import Charts from './Charts';
 
+const safeGradient = [
+  'rgba(0, 255, 255, 0)',
+  'rgba(0, 255, 255, 1)',
+  'rgba(0, 191, 255, 1)',
+  'rgba(0, 127, 255, 1)',
+  'rgba(0, 63, 255, 1)',
+  'rgba(0, 0, 255, 1)',
+  'rgba(0, 0, 225, 1)',
+  'rgba(0, 0, 200, 1)',
+  'rgba(0, 0, 175, 1)',
+  'rgba(0, 0, 150, 1)',
+  'rgba(0, 0, 125, 1)',
+  'rgba(0, 0, 125, 1)',
+  'rgba(0, 0, 125, 1)',
+  'rgba(0, 0, 0, 1)'
+];
+
+const dangerGradient = [
+  'rgba(255, 255, 0, 0)',
+  'rgba(255, 255, 0, 1)',
+  'rgba(255, 225, 0, 1)',
+  'rgba(255, 200, 0, 1)',
+  'rgba(255, 175, 0, 1)',
+  'rgba(255, 150, 0, 1)',
+  'rgba(255, 125, 0, 1)',
+  'rgba(255, 100, 0, 1)',
+  'rgba(255, 50, 0, 1)',
+  'rgba(255, 25, 0, 1)',
+  'rgba(255, 0, 0, 1)',
+  'rgba(255, 0, 0, 1)',
+  'rgba(255, 0, 0, 1)',
+  'rgba(255, 0, 0, 1)'
+];
+
+
 const container = {
   position: 'absolute',
   top: 120,
@@ -81,11 +116,19 @@ class Map extends Component {
       if (status === 'OK') {
         const address = results[0].formatted_address;
         const safe = this.props.nodeList.filter(n => (
-          n.node.report === 'safe' && results[0].place_id === n.node.placeId)
-        );
+          n.node.report === 'safe' && (
+            address === n.node.address ||
+            n.node.placeId === results[0].place_id ||
+            n.node.placeId === results[1].place_id
+          )
+        ));
         const danger = this.props.nodeList.filter(n => (
-          n.node.report === 'danger' && results[0].place_id === n.node.placeId)
-        );
+          n.node.report === 'danger' && (
+            address === n.node.address ||
+            n.node.placeId === results[0].place_id ||
+            n.node.placeId === results[1].place_id
+          )
+        ));
         const reports = safe.size + danger.size;
         if (reports) {
           const risk = danger.size / reports;
@@ -177,22 +220,38 @@ class Map extends Component {
 
   setHeatmap = () => {
     const nodeList = this.props.nodeList;
-    const data = [];
-    nodeList.map(entry => (
-      data.push(new this.maps.LatLng(
-        entry.node.location,
-      ))
-    ));
+    const safeData = [];
+    const dangerData = [];
+    nodeList.map((entry) => {
+      if (entry.node.report === 'danger') {
+        dangerData.push(new this.maps.LatLng(
+          entry.node.location
+        ));
+      } else {
+        safeData.push(new this.maps.LatLng(
+          entry.node.location
+        ));
+      }
+      return null;
+    });
     const options = {
       radius: 15,
       maxIntensity: this.props.nodeList.size / 10,
     };
-    const heatmap = new this.maps.visualization.HeatmapLayer({
-      data,
+    const safeHeatmap = new this.maps.visualization.HeatmapLayer({
+      data: safeData,
       map: this.map,
       options
     });
-    heatmap.setMap(this.map);
+    const dangerHeatmap = new this.maps.visualization.HeatmapLayer({
+      data: dangerData,
+      map: this.map,
+      options
+    });
+    safeHeatmap.set('gradient', safeGradient);
+    dangerHeatmap.set('gradient', dangerGradient);
+    safeHeatmap.setMap(this.map);
+    dangerHeatmap.setMap(this.map);
   }
 
   setRoute = () => {
@@ -211,7 +270,6 @@ class Map extends Component {
     };
     directionsService.route(request, (response, status) => {
       if (status === 'OK') {
-        console.log(response);
         directionsDisplay.setDirections(response);
       }
     });
@@ -261,7 +319,7 @@ class Map extends Component {
                   key={2}
                 />
               </ProgressBar>
-              <Charts safe={this.state.dangerList} danger={this.state.safeList} />
+              <Charts safe={this.state.safeList} danger={this.state.dangerList} />
             </Modal.Body>
           </Modal>
         </div>

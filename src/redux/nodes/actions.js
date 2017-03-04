@@ -44,9 +44,9 @@ export function addNodeFailure(timeLimit) {
   };
 }
 
-export function addNodeSuccess(node) {
+export function loadNodeSuccess(node) {
   return {
-    type: 'ADD_NODE_SUCCESS',
+    type: 'LOAD_NODE_SUCCESS',
     payload: node
   };
 }
@@ -113,7 +113,7 @@ export function loadNodes() {
       const val = data.val();
       Object.keys(val).forEach((key) => {
         const node = val[key];
-        dispatch(addNodeSuccess({ domain, key, node }));
+        dispatch(loadNodeSuccess({ domain, key, node }));
       });
     });
     nodes.on('child_changed', (data) => {
@@ -121,23 +121,24 @@ export function loadNodes() {
       const val = data.val();
       Object.keys(val).forEach((key) => {
         const node = val[key];
-        dispatch(addNodeSuccess({ domain, key, node }));
+        dispatch(loadNodeSuccess({ domain, key, node }));
       });
     });
     nodes.on('child_removed', (data) => {
       const key = data.key;
       const node = {};
       node[key] = null;
-      dispatch(addNodeSuccess(node));
+      dispatch(loadNodeSuccess(node));
     });
   };
 }
 
 export function addNode(report) {
   return (dispatch, getState) => {
+    const timestamp = Date.now();
     const state = getState();
     if (report && !isAnon(state)) {
-      const timeLimit = Date.now() - getUserTimestamp(state);
+      const timeLimit = timestamp - getUserTimestamp(state);
       if (timeLimit > 600000) {
         navigator.geolocation.getCurrentPosition((position) => {
           GoogleMapsLoader.load((google) => {
@@ -145,7 +146,6 @@ export function addNode(report) {
               lat: position.coords.latitude,
               lng: position.coords.longitude
             };
-            const timestamp = Date.now();
             const domain = getUserDomain(state);
             const userNodes = getUserNodeList(state);
             const uid = getUid(state);
