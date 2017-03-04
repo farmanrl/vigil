@@ -1,7 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import {
-  ControlLabel,
-} from 'react-bootstrap';
+import { ControlLabel } from 'react-bootstrap';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -13,6 +11,36 @@ import {
   BarChart,
   Bar
 } from 'recharts';
+import { scaleTime, timeDay } from 'd3';
+import moment from 'moment';
+
+const getTicks = (data) => {
+  if (!data || !data.length) {
+    return [];
+  }
+  const domain = [
+    new Date(data[0].time),
+    new Date(data[data.length - 1].time)
+  ];
+  const scale = scaleTime().domain(domain).range([0, 1]);
+  const ticks = scale.ticks(timeDay, 1);
+  return ticks.map(entry => +entry);
+};
+
+const getTicksData = (data, ticks) => {
+  if (!data || !data.length) {
+    return [];
+  }
+  const dataMap = new Map(data.map(i => [i.time, i]));
+  ticks.forEach((item) => {
+    if (!dataMap.has(item)) {
+      data.push({ time: item });
+    }
+  });
+  return data;
+};
+
+const dateFormat = time => moment(time).format('MM/DD');
 
 class Charts extends Component {
   static propTypes = {
@@ -48,15 +76,14 @@ class Charts extends Component {
     if (this.props.safe || this.props.danger) {
       if (this.props.safe) {
         this.props.safe.map((entry) => {
-          const time = new Date(entry.node.timestamp);
-          const day = time.toString().substring(0, 3);
-          const date = time.getDate();
-          const month = time.getMonth();
-          const formattedTime = `${month + 1}/${date}`;
-          if (timeline[formattedTime]) {
-            timeline[formattedTime].safe += 1;
+          const timestamp = new Date(entry.node.timestamp);
+          const day = timestamp.toString().substring(0, 3);
+          timestamp.setHours(0, 0, 0, 0);
+          const time = timestamp.getTime();
+          if (timeline[time]) {
+            timeline[time].safe += 1;
           } else {
-            timeline[formattedTime] = { safe: 1, danger: 0, formattedTime };
+            timeline[time] = { safe: 1, danger: 0, time };
           }
           week[day].safe += 1;
           return null;
@@ -64,19 +91,18 @@ class Charts extends Component {
       }
       if (this.props.danger) {
         this.props.danger.map((entry) => {
-          const time = new Date(entry.node.timestamp);
-          const day = time.toString().substring(0, 3);
-          const date = time.getDate();
-          const month = time.getMonth();
-          const formattedTime = `${month + 1}/${date}`;
-          if (timeline[formattedTime]) {
-            if (timeline[formattedTime].danger) {
-              timeline[formattedTime].danger += 1;
+          const timestamp = new Date(entry.node.timestamp);
+          const day = timestamp.toString().substring(0, 3);
+          timestamp.setHours(0, 0, 0, 0);
+          const time = timestamp.getTime();
+          if (timeline[time]) {
+            if (timeline[time].danger) {
+              timeline[time].danger += 1;
             } else {
-              timeline[formattedTime].danger = 0;
+              timeline[time].danger = 0;
             }
           } else {
-            timeline[formattedTime] = { safe: 0, danger: 1, formattedTime };
+            timeline[time] = { safe: 0, danger: 1, time };
           }
           week[day].danger += 1;
           return null;
@@ -85,7 +111,11 @@ class Charts extends Component {
       timelineData = Object.values(timeline);
       weekData = Object.values(week);
     }
-    this.setState({ weekData, timelineData });
+    const sortedData = timelineData.sort((a, b) => a.time - b.time);
+    const timelineTicks = getTicks(sortedData);
+    const completeData = getTicksData(sortedData, timelineTicks);
+    const completeSortedData = completeData.sort((a, b) => a.time - b.time);
+    this.setState({ timelineTicks, completeSortedData, weekData });
   }
 
   render() {
@@ -93,7 +123,7 @@ class Charts extends Component {
       <div>
         <ControlLabel>Timeline</ControlLabel>
         <ResponsiveContainer width="90%" height={200}>
-          <AreaChart data={this.state.timelineData}>
+          <AreaChart data={this.state.completeSortedData}>
             <defs>
               <linearGradient id="colorSafe" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#337ab7" stopOpacity={0.9} />
@@ -104,7 +134,12 @@ class Charts extends Component {
                 <stop offset="95%" stopColor="#d9534f" stopOpacity={0.1} />
               </linearGradient>
             </defs>
-            <XAxis dataKey="formattedTime" />
+            <XAxis
+              dataKey="time"
+              ticks={this.state.timelineTicks}
+              tickCount={this.state.timelineTicks.length}
+              tickFormatter={dateFormat}
+            />
             <YAxis allowDecimals={false} />
             <Area
               type="monotone"
@@ -112,6 +147,7 @@ class Charts extends Component {
               stroke="#337ab7"
               fillOpacity={1}
               fill="url(#colorSafe)"
+              connectNulls
             />
             <Area
               type="monotone"
@@ -119,10 +155,11 @@ class Charts extends Component {
               stroke="#d9534f"
               fillOpacity={1}
               fill="url(#colorDanger)"
+              connectNulls
             />
           </AreaChart>
         </ResponsiveContainer>
-        <ControlLabel>Charts</ControlLabel>
+        <ControlLabel>Week</ControlLabel>
         <ResponsiveContainer width="90%" height={200}>
           <BarChart data={this.state.weekData}>
             <defs>
