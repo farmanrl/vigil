@@ -35,10 +35,12 @@ export function nodesReducer(state = new NodesState(), { payload, type }) {
         valid: false,
         timelimit: payload,
       });
-    case 'ADD_NODE_SUCCESS':
+    case 'LOAD_NODE_SUCCESS':
       return state.merge({
         showModal: null,
-        nodeList: state.nodeList.filter(n => n.key !== payload.key).push(payload)
+        nodeList: state.nodeList
+                       .filter(n => n.key !== payload.key)
+                       .push(payload)
       });
     case 'ADD_NODE_FAILURE':
       return state.merge({
@@ -87,4 +89,5 @@ export function nodesReducer(state = new NodesState(), { payload, type }) {
     default:
       return state;
   }
+  return null;
 }
