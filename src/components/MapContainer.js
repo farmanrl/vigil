@@ -106,8 +106,8 @@ class MapContainer extends Component {
           show={this.props.nodes.showModal === 'location'}
           close={this.props.closeModal}
           address={this.props.nodes.address}
-          danger={this.props.nodes.nodeList ? this.props.nodes.nodeList.filter(n => n.node.placeId === this.props.nodes.placeId).filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'danger') : null}
-          safe={this.props.nodes.nodeList ? this.props.nodes.nodeList.filter(n => n.node.placeId === this.props.nodes.placeId).filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'safe') : null}
+          danger={this.props.nodes.nodeList ? this.props.nodes.nodeList.filter(n => n.node.address === this.props.nodes.address).filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'danger') : null}
+          safe={this.props.nodes.nodeList ? this.props.nodes.nodeList.filter(n => n.node.address === this.props.nodes.address).filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'safe') : null}
           filter={this.props.nodes.nodeFilter}
         />
         <Reports
