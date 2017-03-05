@@ -3,6 +3,7 @@ import { Button, Label } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { authActions } from '../redux/auth';
 import logo from './vigil.png';
+import { version } from '../../package.json';
 
 const background = {
   height: 'auto',
@@ -20,7 +21,7 @@ export function SignIn({ signInWithGoogle, signInAnon }) {
         alt="logo"
         style={{ height: 200, paddingTop: 12 }}
       />
-      <h1>VIGIL</h1><h4><Label>1.1</Label></h4>
+      <h1>VIGIL</h1><h4><Label>{version}</Label></h4>
       <br />
       <Button bsSize="lg" onClick={signInWithGoogle}>
         Sign In

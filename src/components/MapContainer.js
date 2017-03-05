@@ -33,14 +33,18 @@ class MapContainer extends Component {
     auth: PropTypes.object,
     nodes: PropTypes.object,
     update: PropTypes.func.isRequired,
+    changeNodeFilter: PropTypes.func.isRequired,
     addNode: PropTypes.func,
     showModal: PropTypes.func,
     closeModal: PropTypes.func,
     submitUserDirection: PropTypes.func.isRequired,
     removeUserDirection: PropTypes.func.isRequired,
+    submitUserStyle: PropTypes.func.isRequired,
     submitUserContact: PropTypes.func.isRequired,
     removeUserContact: PropTypes.func.isRequired,
     setRoute: PropTypes.func,
+    directionList: PropTypes.object,
+    user: PropTypes.object.isRequired,
   }
 
   componentWillMount() {
@@ -93,9 +97,15 @@ class MapContainer extends Component {
           removeUserContact={this.props.removeUserContact}
         />
         <DirectionList
-          home={this.props.user.directionList.filter(d => d.type === 'home').toJS()}
-          favoriteList={this.props.user.directionList.filter(d => d.type === 'favorite').toJS()}
-          placeList={this.props.user.directionList.filter(d => d.type === 'place').toJS()}
+          home={this.props.user.directionList
+                    .filter(d => d.type === 'home').toJS()
+               }
+          favoriteList={this.props.user.directionList
+                            .filter(d => d.type === 'favorite').toJS()
+                       }
+          placeList={this.props.user.directionList
+                         .filter(d => d.type === 'place').toJS()
+                    }
           show={this.props.nodes.showModal === 'directions'}
           close={this.props.closeModal}
           submitUserDirection={this.props.submitUserDirection}
@@ -106,53 +116,91 @@ class MapContainer extends Component {
           show={this.props.nodes.showModal === 'location'}
           close={this.props.closeModal}
           address={this.props.nodes.address}
-          danger={this.props.nodes.nodeList ? this.props.nodes.nodeList.filter(n => n.node.address === this.props.nodes.address).filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'danger') : null}
-          safe={this.props.nodes.nodeList ? this.props.nodes.nodeList.filter(n => n.node.address === this.props.nodes.address).filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'safe') : null}
+          danger={this.props.nodes.nodeList ?
+                  this.props.nodes.nodeList
+                      .filter(n => n.node.address === this.props.nodes.address)
+                      .filter(n => n.node.timestamp > this.props.nodes.timeFilter)
+                      .filter(n => n.node.report === 'danger') : null
+                 }
+          safe={this.props.nodes.nodeList ?
+                this.props.nodes.nodeList
+                    .filter(n => n.node.address === this.props.nodes.address)
+                    .filter(n => n.node.timestamp > this.props.nodes.timeFilter)
+                    .filter(n => n.node.report === 'safe') : null
+               }
           filter={this.props.nodes.nodeFilter}
         />
         <Reports
           filter={this.props.nodes.nodeFilter}
-          safe={this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'safe').size}
-          danger={this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter).filter(n => n.node.report === 'danger').size}
-          total={this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter).size}
+          safe={this.props.nodes.nodeList ?
+                this.props.nodes.nodeList
+                    .filter(n => n.node.timestamp > this.props.nodes.timeFilter)
+                    .filter(n => n.node.report === 'safe') : null
+               }
+          danger={this.props.nodes.nodeList ?
+                  this.props.nodes.nodeList
+                      .filter(n => n.node.timestamp > this.props.nodes.timeFilter)
+                      .filter(n => n.node.report === 'danger') : null
+                 }
+          showModal={this.props.showModal}
+          show={this.props.nodes.showModal === 'report'}
+          close={this.props.closeModal}
         />
         {this.props.user.style &&
-         <Map
-           loader={GoogleMapsLoader}
-           key={[this.props.nodes.timeFilter, this.props.user.style, this.props.user.route, this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter).size, this.props.user.directionList, this.props.nodes.position]}
-           location={this.props.nodes.position}
-           nodeList={this.props.nodes.nodeList.filter(n => n.node.timestamp > this.props.nodes.timeFilter)}
-           home={this.props.user.directionList.filter(d => d.type === 'home').toJS()}
-           favoriteList={this.props.user.directionList.filter(d => d.type === 'favorite').toJS()}
-           placeList={this.props.user.directionList.filter(d => d.type === 'place').toJS()}
+        <Map
+          loader={GoogleMapsLoader}
+          key={[
+            this.props.nodes.timeFilter,
+            this.props.user.style,
+            this.props.user.route,
+            this.props.nodes.nodeList
+                .filter(n => n.node.timestamp >
+                  this.props.nodes.timeFilter).size,
+            this.props.user.directionList,
+            this.props.nodes.position
+          ]}
+          location={this.props.nodes.position}
+          nodeList={this.props.nodes.nodeList
+                        .filter(n => n.node.timestamp >
+                          this.props.nodes.timeFilter)
+                   }
+          home={this.props.user.directionList
+                    .filter(d => d.type === 'home').toJS()
+               }
+          favoriteList={this.props.user.directionList
+                            .filter(d => d.type === 'favorite').toJS()
+                       }
+          placeList={this.props.user.directionList
+                         .filter(d => d.type === 'place').toJS()
+                    }
 
-           filter={this.props.nodes.nodeFilter}
-           style={this.props.user.style ? this.props.user.style.toJS() : null}
-           route={this.props.user.route ? this.props.user.route.toJS() : null}
-         />
+          filter={this.props.nodes.nodeFilter}
+          style={this.props.user.style ? this.props.user.style.toJS() : null}
+          route={this.props.user.route ? this.props.user.route.toJS() : null}
+        />
         }
         <div style={subcontrols}>
           {this.props.user.route ?
-           <ButtonGroup>
-             <Button
-               href={`https://www.google.com/maps/dir/Current+Location/${this.props.user.route.get('lat')}, ${this.props.user.route.get('lng')}`}
-               bsStyle="success"
-             >
-               GPS
-             </Button>
-             <Button
-               onClick={() => this.props.setRoute(null)}
-             >
-               Cancel
-             </Button>
-           </ButtonGroup>
+            <ButtonGroup>
+              <Button
+                href={`https://www.google.com/maps/dir/Current+Location/${this.props.user.route.get('lat')}, ${this.props.user.route.get('lng')}`}
+                bsStyle="success"
+              >
+                GPS
+              </Button>
+              <Button
+                onClick={() => this.props.setRoute(null)}
+              >
+                Cancel
+              </Button>
+            </ButtonGroup>
            :
-           <Button
-             href="https://www.google.com/maps/dir/Current+Location/"
-             bsStyle="success"
-           >
-             GPS
-           </Button>
+            <Button
+              href="https://www.google.com/maps/dir/Current+Location/"
+              bsStyle="success"
+            >
+              GPS
+            </Button>
           }
         </div>
       </div>
