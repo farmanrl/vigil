@@ -3,6 +3,7 @@ import { Button, Glyphicon, OverlayTrigger, Tooltip, Modal, Label, Badge, Well }
 import { browserHistory } from 'react-router';
 import './App.css';
 import logo from './vigil.png';
+import { version } from '../../package.json';
 
 class Header extends Component {
   static propTypes = {
@@ -43,7 +44,7 @@ class Header extends Component {
               />
               <div>
                 <h2 className="Header-title">VIGIL</h2>
-                <h5 className="Header-subtitle"><Label>1.1</Label></h5>
+                <h5 className="Header-subtitle"><Label>{version}</Label></h5>
               </div>
             </Button>
             <div className="Header-controls">
