@@ -5,36 +5,30 @@ import Charts from './Charts';
 
 const safeGradient = [
   'rgba(0, 255, 255, 0)',
-  'rgba(0, 255, 255, 1)',
-  'rgba(0, 191, 255, 1)',
-  'rgba(0, 127, 255, 1)',
-  'rgba(0, 63, 255, 1)',
-  'rgba(0, 0, 255, 1)',
-  'rgba(0, 0, 225, 1)',
-  'rgba(0, 0, 200, 1)',
-  'rgba(0, 0, 175, 1)',
-  'rgba(0, 0, 150, 1)',
-  'rgba(0, 0, 125, 1)',
-  'rgba(0, 0, 125, 1)',
-  'rgba(0, 0, 125, 1)',
-  'rgba(0, 0, 0, 1)'
+  '#80c4ff',
+  '#66b8ff',
+  '#4dacff',
+  '#33a0ff',
+  '#1a94ff',
+  '#0088ff',
+  '#006dcc',
+  '#005fb3',
+  '#005299',
+  '#004480',
 ];
 
 const dangerGradient = [
-  'rgba(255, 255, 0, 0)',
-  'rgba(255, 255, 0, 1)',
-  'rgba(255, 225, 0, 1)',
-  'rgba(255, 200, 0, 1)',
-  'rgba(255, 175, 0, 1)',
-  'rgba(255, 150, 0, 1)',
-  'rgba(255, 125, 0, 1)',
-  'rgba(255, 100, 0, 1)',
-  'rgba(255, 50, 0, 1)',
-  'rgba(255, 25, 0, 1)',
-  'rgba(255, 0, 0, 1)',
-  'rgba(255, 0, 0, 1)',
-  'rgba(255, 0, 0, 1)',
-  'rgba(255, 0, 0, 1)'
+  'rgba(125, 125, 125, 0)',
+  '#ff8480',
+  '#ff6b66',
+  '#ff3a33',
+  '#ff211a',
+  '#ff0900',
+  '#e60800',
+  '#cc0700',
+  '#b30600',
+  '#990500',
+  '#800400',
 ];
 
 
@@ -250,8 +244,6 @@ class Map extends Component {
     });
     safeHeatmap.set('gradient', safeGradient);
     dangerHeatmap.set('gradient', dangerGradient);
-    safeHeatmap.setMap(this.map);
-    dangerHeatmap.setMap(this.map);
   }
 
   setRoute = () => {
@@ -319,7 +311,10 @@ class Map extends Component {
                   key={2}
                 />
               </ProgressBar>
-              <Charts safe={this.state.safeList} danger={this.state.dangerList} />
+              <Charts
+                safe={this.state.safeList}
+                danger={this.state.dangerList}
+              />
             </Modal.Body>
           </Modal>
         </div>
