@@ -81,10 +81,11 @@ class Header extends Component {
           </div>
           <Modal show={this.state.showModal} onHide={this.close}>
             <Modal.Header closeButton>
-              <Modal.Title>VIGIL <Badge>1.1</Badge></Modal.Title>
+              <Modal.Title>VIGIL <Badge>{version}</Badge></Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Modal.Title>Created by Richard Farman</Modal.Title>
+              <hr />
               <h5>Software Development, Multimedia Production</h5>
               <h5>Computer Science Student at Whitman College</h5>
               <p>
@@ -93,18 +94,11 @@ class Header extends Component {
               </p>
               <Well>
                 <p>Contact me if you are interested in getting involved!</p>
-                <p>farmanrl@whitman.edu</p>
                 <p><a href="http://farmanrl.me">My Website</a></p>
+                <p><a href="https://www.linkedin.com/in/farmanrl">LinkedIn</a></p>
+                <p><a href="https://github.com/farmanrl">Github</a></p>
               </Well>
             </Modal.Body>
-            <Modal.Footer>
-              <a href="https://www.linkedin.com/in/farmanrl">
-                <Button bsStyle="link">LinkedIn</Button>
-              </a>
-              <a href="https://github.com/farmanrl">
-                <Button bsStyle="link">Github</Button>
-              </a>
-            </Modal.Footer>
           </Modal>
         </div>
       );
