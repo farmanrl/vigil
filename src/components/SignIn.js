@@ -27,18 +27,18 @@ export function SignIn({ signInWithGoogle, signInAnon }) {
         Sign In
       </Button>
       <br />
-      <h4>Sign in for more features.</h4>
-      <h4>All user data is anonymous.</h4>
+      <h4>Sign in for more features</h4>
+      <h4><i>All user data is anonymous</i></h4>
       <br />
       <Button bsSize="lg" onClick={signInAnon}>
         Continue
       </Button>
       <br />
-      <h4>Continue without authorization.</h4>
+      <h4>Continue without authentication</h4>
       <br />
-      <h5>Add this page to your home screen for a mobile app</h5>
+      <h5>Add this page to your home screen for mobile.</h5>
       <h5>VIGIL is under ongoing development.</h5>
-      <h5>Created by Richard Farman</h5>
+      <h5>Created by Richard Farman.</h5>
     </div>
   );
 }

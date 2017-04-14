@@ -99,6 +99,8 @@ export function update() {
           }
         });
       });
+    }, (error) => {
+      console.log(error);
     });
     const time = Date.now();
     dispatch(updateTimestamp(time));

@@ -4,6 +4,7 @@ import {
   ButtonGroup,
   DropdownButton,
   MenuItem,
+  Glyphicon,
 } from 'react-bootstrap';
 
 const controls = {
@@ -29,6 +30,7 @@ class Controls extends Component {
           >
             <MenuItem
               eventKey="1"
+              disabled={!this.props.position}
               onClick={() => this.props.showModal('location')}
             >
               Where am I?
@@ -36,6 +38,7 @@ class Controls extends Component {
             <MenuItem divider />
             <MenuItem
               eventKey="2"
+              disabled={!this.props.position}
               onClick={() => this.props.showModal('directions')}
             >
               Go to...
@@ -61,6 +64,14 @@ class Controls extends Component {
             >
               Update Time/Location
             </MenuItem>
+            {!this.props.position &&
+              <MenuItem
+                eventKey="6"
+                disabled={true}
+              >
+                <h6>Location services disabled</h6>
+              </MenuItem>
+            }
           </DropdownButton>
 
           <Button
@@ -68,14 +79,14 @@ class Controls extends Component {
             onClick={() => this.props.showModal('safe')}
             disabled={this.props.anon || !this.props.position}
           >
-            Safe
+            <Glyphicon glyph="thumbs-up" />
           </Button>
           <Button
             bsStyle="danger"
             onClick={() => this.props.showModal('danger')}
             disabled={this.props.anon || !this.props.position}
           >
-            Danger
+            <Glyphicon glyph="thumbs-down" />
           </Button>
 
         </ButtonGroup>

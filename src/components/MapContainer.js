@@ -9,6 +9,7 @@ import Filters from './Filters';
 import Map from './Map';
 import Controls from './Controls';
 import Safe from './Safe';
+import Report from './Report';
 import Danger from './Danger';
 import Customize from './Customize';
 import ContactList from './ContactList';
@@ -51,12 +52,6 @@ class MapContainer extends Component {
     this.props.update();
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.nodes.filter !== this.props.nodes.filter) {
-      this.props.update();
-    }
-  }
-
   render() {
     return (
       <div>
@@ -70,15 +65,9 @@ class MapContainer extends Component {
           position={this.props.nodes.position}
           update={this.props.update}
         />
-        <Safe
-          show={this.props.nodes.showModal === 'safe'}
-          submit={this.props.addNode}
-          close={this.props.closeModal}
-          limit={this.props.nodes.timelimit}
-          address={this.props.nodes.address}
-        />
-        <Danger
-          show={this.props.nodes.showModal === 'danger'}
+        <Report
+          show={this.props.nodes.showModal === 'safe' || this.props.nodes.showModal ===  'danger'}
+          report={this.props.nodes.showModal}
           submit={this.props.addNode}
           close={this.props.closeModal}
           limit={this.props.nodes.timelimit}

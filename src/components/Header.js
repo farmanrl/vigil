@@ -81,11 +81,11 @@ class Header extends Component {
           </div>
           <Modal show={this.state.showModal} onHide={this.close}>
             <Modal.Header closeButton>
-              <Modal.Title>VIGIL <Badge>1.1</Badge></Modal.Title>
+              <Modal.Title>VIGIL <Badge>{version}</Badge></Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <Modal.Title>Created by Richard Farman</Modal.Title>
-              <h5>Software Development, Multimedia Production</h5>
+              <h3>Richard Farman</h3>
+              <h4>Founder, Lead Developer</h4>
               <h5>Computer Science Student at Whitman College</h5>
               <p>
                 VIGIL is under ongoing development,

@@ -23,11 +23,11 @@ class Danger extends Component {
         </Modal.Header>
 
         <Modal.Body>
-          <Modal.Title>Mark Location as Danger</Modal.Title>
+          <Modal.Title>Report Location - Danger</Modal.Title>
           <hr />
           <p>Your report will be  displayed anonymously to other users on the map.</p>
-          <p>This action cannot be undone, so use at your discretion.</p>
-          <p>If you wish to continue, submit and stay safe!</p>
+          <p>You can change your report after 10 minutes.</p>
+          <p>If you wish to continue, press submit!</p>
         </Modal.Body>
 
         <Modal.Footer>
